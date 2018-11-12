@@ -11,6 +11,4 @@
 |
 */
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/{id}', 'UserController@index');
