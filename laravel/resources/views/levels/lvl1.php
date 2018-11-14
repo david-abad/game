@@ -3,7 +3,7 @@
 
 <head>
     <title>Nivel 1</title>
-    <link rel="stylesheet" href="../css/styleLvl1.css">
+    <link rel="stylesheet" href="../css/styleLvl1.css" type="text/css">
 </head>
 
 <body>
@@ -19,7 +19,7 @@
         9. enemy objects / enemy movement
         10. collision detection
     -->
-    <div id="background" style="height: 100%; width: 100%;">
+    <div id="background">
         <div id="hero"></div>
         <div id="missiles"></div>
         <div id="enemies"></div>
