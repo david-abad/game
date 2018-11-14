@@ -57,9 +57,34 @@
             width: 100%;
             margin-top: 25px;
         }
-        @media only screen and (max-width: 600px) {
+        .hoverable:hover{
+            background-color: rgb(76, 19, 150);
+            opacity: 1.0;
+            -webkit-transition: background 0.2s linear;
+            -moz-transition: background 0.2s linear;
+            -o-transition: background 0.2s linear;
+            -ms-transition: background 0.2s linear;
+            transition: background 0.2s linear;
+        }
+        .objetos{
+            height: 150px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .tienda{
+            /* overflow-y: scroll; */
+            /* overflow-x: hidden; */
+            max-height: 600px !important;
+            padding-bottom: -100px;
+        }
+
+        @media only screen and (max-width: 720px) {
                 .card_s{
                     min-height: unset;
+                }
+                .objetos{
+                    width: 161px !important;
                 }
         }
     </style>
@@ -106,7 +131,7 @@
                                         <div class="col s2 l6">
                                             <img src="coins.png" style="height: 50px; margin-right: 320px; margin-top: 5px;">
                                         </div>
-                                        <div class="col s1 l6">
+                                        <div class="col s1 l6 right-align">
                                             <p>Créditos</p>
                                             <p style="font-size: 25px; font-weight: bold;">{{ $users->creditos }}</p>
                                         </div>
@@ -115,8 +140,25 @@
                             </div>
                             <div class="row">
                                 <div class="col s12">
-                                    <div class="card">
-                                        <!-- Contenido de la tiene wuowuo -->
+                                    <div id="style-1" class="card grey transparent z-depth-0 tienda scrollbar" style="margin-top: -20px; width: 100%;">
+                                        <div class="row force-overflow">
+                                            @foreach($objetos as $tmp)
+                                            <div class="col s6 m3 l3 hoverable objetos">
+                                                <div class="col-content center-align" style="margin: 5px;">
+                                                    <img class="" src="{{ $tmp->archivo }}" style="height: 80px; margin-top: 5px;">
+                                                    <p class="white-text">{{$tmp->nombre}}</p>
+                                                    <div class="row center-align" style="margin-left: 15px;">
+                                                        <div class="col s3 right-align">
+                                                            <img src="coins.png" style="width: 25px;">
+                                                        </div>
+                                                        <div class="col s9 left-align" style="font-weight: bold; font-size: 18px;">
+                                                            <p> {{ $tmp->costo }} </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -128,7 +170,7 @@
     </div>
     <!-- Mobile view -->
     <ul class="sidenav grey darken-4" id="mobile-demo">
-        <li><a class="white-text grey darken-3 valign-wrapper"><img class="right valign" src={{ $users->avatar }} style="width:50px; padding:5px; margin-right: 10px;">{{
+        <li><a class="white-text grey darken-3 valign-wrapper"><img class="right valign" src= "{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{
                 $users->nombre }}</a></li>
         <li><a class="white-text valign-wrapper">Cambiar avatar</a></li>
         <li><a class="white-text valign-wrapper">Cerrar sesión</a></li>
@@ -150,7 +192,7 @@
         });
         $('select').formSelect();
         $('.sidenav').sidenav();
-        if ({{ $users - > nivelActual}} == 1) {
+        if ({{ $users->nivelActual }} == 1) {
             $("#selNivel").addClass("disabled");
             $("#reiniciar").addClass("disabled");
         }
