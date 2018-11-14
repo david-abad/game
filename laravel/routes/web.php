@@ -12,3 +12,5 @@
 */
 
 Route::get('/{id}', 'UserController@index');
+
+Route::get('start/{level}', 'GameController@startGame');

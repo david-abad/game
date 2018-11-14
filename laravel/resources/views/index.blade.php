@@ -66,17 +66,18 @@
             -ms-transition: background 0.2s linear;
             transition: background 0.2s linear;
         }
+        .hoverable{
+            opacity: 1.0;
+            -webkit-transition: background 0.5s linear;
+            -moz-transition: background 0.5s linear;
+            -o-transition: background 0.5s linear;
+            -ms-transition: background 0.5s linear;
+            transition: background 0.5s linear;
+        }
         .objetos{
             height: 150px;
             border-radius: 10px;
             cursor: pointer;
-        }
-
-        .tienda{
-            /* overflow-y: scroll; */
-            /* overflow-x: hidden; */
-            max-height: 600px !important;
-            padding-bottom: -100px;
         }
 
         @media only screen and (max-width: 720px) {
@@ -110,7 +111,7 @@
                     <div class="card_s card grey darken-4" style="margin-top: 25px;">
                         <div class="card-content white-text" style="width: 100%;">
                             <span class="card-title">Jugar</span>
-                            <a class="waves-effect green accent-4 btn btn-juego">Comenzar juego</a>
+                            <a id="startGame" class="waves-effect green accent-4 btn btn-juego">Comenzar juego</a>
                             <a id="selNivel" class="waves-effect indigo accent-3 btn btn-juego">Seleccionar nivel</a>
                             <a class="waves-effect white btn btn-juego" style="color: #3B5998;"><img src="https://img.icons8.com/material/50/3b5998/facebook-f.png"
                                     class="material-icons left" style="width: 25px; margin-top: 5px;">Compartir</a>
@@ -140,8 +141,8 @@
                             </div>
                             <div class="row">
                                 <div class="col s12">
-                                    <div id="style-1" class="card grey transparent z-depth-0 tienda scrollbar" style="margin-top: -20px; width: 100%;">
-                                        <div class="row force-overflow">
+                                    <div id="style-1" class="card grey transparent z-depth-0" style="margin-top: -20px; width: 100%;">
+                                        <div class="row">
                                             @foreach($objetos as $tmp)
                                             <div class="col s6 m3 l3 hoverable objetos">
                                                 <div class="col-content center-align" style="margin: 5px;">
@@ -196,6 +197,9 @@
             $("#selNivel").addClass("disabled");
             $("#reiniciar").addClass("disabled");
         }
+        $("#startGame").click(function(){
+            window.open("/start/1", "_blank");
+        });
     });
 
 </script>
