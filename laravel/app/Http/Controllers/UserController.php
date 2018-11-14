@@ -15,6 +15,6 @@ class UserController extends Controller {
         $objetos = DB::table('objetos')->get();
         /*Buscar todos los objetos que le pertenecen al usuario*/
         $compras = DB::select('select * from objetos inner join compras on objetos.id = compras.id_objetos where id_usuarios = '.$id);
-        return view('index', ["users"=>$user, "compras"=>$compras, "objetos"=>$objetos]);
+        return view('index', ["users"=>$user, "compras"=>$compras, "objetos"=>$objetos])->with($bought=false);
    }
 }

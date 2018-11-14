@@ -98,7 +98,7 @@
                 <a href="#" class="brand-logo" style="font-family: Space; margin-left: 25px;">Juego TSW</a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
-                    <li><a class="dropdown-trigger valign-wrapper" data-target='user_dropdown2'><img class="left" src={{ $users->avatar }}
+                    <li><a class="dropdown-trigger valign-wrapper" data-target='user_dropdown2'><img class="left" src="img_obj/{{ $users->avatar }}"
                                 style="width:50px; padding:5px;">{{ $users->nombre }}</a></li>
                 </ul>
             </div>
@@ -143,21 +143,33 @@
                                 <div class="col s12">
                                     <div id="style-1" class="card grey transparent z-depth-0" style="margin-top: -20px; width: 100%;">
                                         <div class="row">
+                                            
                                             @foreach($objetos as $tmp)
-                                            <div class="col s6 m3 l3 hoverable objetos">
-                                                <div class="col-content center-align" style="margin: 5px;">
-                                                    <img class="" src="{{ $tmp->archivo }}" style="height: 80px; margin-top: 5px;">
-                                                    <p class="white-text">{{$tmp->nombre}}</p>
-                                                    <div class="row center-align" style="margin-left: 15px;">
-                                                        <div class="col s3 right-align">
-                                                            <img src="coins.png" style="width: 25px;">
-                                                        </div>
-                                                        <div class="col s9 left-align" style="font-weight: bold; font-size: 18px;">
-                                                            <p> {{ $tmp->costo }} </p>
+                                                @php $bought=0; @endphp
+                                                @foreach($compras as $comp)
+                                                    @if($comp->id == $tmp->id) 
+                                                        @php $bought=true; @endphp
+                                                    @endif
+                                                @endforeach
+                                                <div class="col s6 m3 l3 hoverable objetos" onclick="buy({{$tmp->id}}, {{$bought}}, {{$tmp->costo}})" style="margin: 0px;">
+                                                    <div class="col-content center-align">
+                                                        @if($bought)
+                                                        <img class="" src="img_obj/bought.png" style="height: 80px; margin-top: 5px;">
+                                                        @else
+                                                        <img class="" src="img_obj/{{ $tmp->archivo }}" style="height: 80px; margin-top: 5px;">
+                                                        @endif
+                                                        <p class="white-text">{{$tmp->nombre}}</p>
+                                                        <div class="row center-align" style="margin-left: 15px;">
+                                                            <div class="col s3 right-align">
+                                                                <img src="coins.png" style="width: 25px;">
+                                                            </div>
+                                                            <div class="col s9 left-align" style="font-weight: bold; font-size: 18px;">
+                                                                <p> {{ $tmp->costo }} </p>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                                @php $bought = false; @endphp
                                             @endforeach
                                         </div>
                                     </div>
@@ -171,7 +183,7 @@
     </div>
     <!-- Mobile view -->
     <ul class="sidenav grey darken-4" id="mobile-demo">
-        <li><a class="white-text grey darken-3 valign-wrapper"><img class="right valign" src= "{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{
+        <li><a class="white-text grey darken-3 valign-wrapper"><img class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{
                 $users->nombre }}</a></li>
         <li><a class="white-text valign-wrapper">Cambiar avatar</a></li>
         <li><a class="white-text valign-wrapper">Cerrar sesión</a></li>
@@ -202,6 +214,13 @@
         });
     });
 
+    function buy(id, bought, costo){
+        if(bought!=1){
+            alert("Cuesta " + costo + " créditos");
+        }else{
+            alert("Este producto ya lo adquiriste");
+        }
+    }
 </script>
 
 </html>
