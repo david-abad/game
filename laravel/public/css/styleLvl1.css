@@ -11,25 +11,19 @@ div #hero {
     background-image: url('../lvl1/hero.png');
     position: absolute;
     left: 575px;
-    top: 700px;
+    top: 500px;
 }
 
-div #missiles {
-    width: 1200px;
-    height: 800px;
-    position: absolute;
+#background{
+    position: fixed;
+    top: 0%;
+    left: 6%;
 }
 
 div .missile1 {
     width: 10px;
     height: 28px;
     background-image: url('../lvl1/missile1.png');
-    position: absolute;
-}
-
-div #enemies {
-    width: 1200px;
-    height: 800px;
     position: absolute;
 }
 
@@ -45,13 +39,25 @@ body, html{
 }
 
 body{
+    position: fixed;
     background-image: url('../lvl1/background.png');
 
     /* Full height */
     height: 100%; 
+    width: 100%;
 
     /* Center and scale the image nicely */
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
 }
+
+.imgz{
+    width: 20px;
+}
+
+.centered {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+  }
