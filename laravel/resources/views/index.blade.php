@@ -155,7 +155,7 @@
                                                 <div class="col s6 m3 l3 hoverable objetos" onclick="buy({{$tmp->id}}, {{$bought}}, {{$tmp->costo}})" style="margin: 0px;">
                                                     <div class="col-content center-align">
                                                         @if($bought)
-                                                        <img class="" src="img_obj/bought.png" style="height: 80px; margin-top: 5px;">
+                                                        <img class="" src="img_obj/bought/{{ $tmp->archivo }}" style="height: 80px; margin-top: 5px;">
                                                         @else
                                                         <img class="" src="img_obj/{{ $tmp->archivo }}" style="height: 80px; margin-top: 5px;">
                                                         @endif
