@@ -115,7 +115,7 @@
                             <a id="selNivel" class="waves-effect indigo accent-3 btn btn-juego">Seleccionar nivel</a>
                             <a class="waves-effect white btn btn-juego" style="color: #3B5998;"><img src="https://img.icons8.com/material/50/3b5998/facebook-f.png"
                                     class="material-icons left" style="width: 25px; margin-top: 5px;">Compartir</a>
-                           <a class="btn-flat btn-juego" style="cursor: default;"></a>
+                            <a class="btn-flat btn-juego" style="cursor: default;"></a>
                             <a id="reiniciar" class="waves-effect red darken-3 btn btn-juego">Reiniciar</a>
                         </div>
                     </div>
