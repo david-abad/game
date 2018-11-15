@@ -19,6 +19,7 @@
             max-width: 100%;
             overflow-x: hidden;
         }
+        /* Checando que esto funcione */
         @font-face {
         font-family: Space;
         src: url('SPACEBAR.ttf');
