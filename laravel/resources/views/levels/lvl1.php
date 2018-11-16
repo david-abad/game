@@ -141,6 +141,8 @@
             }
             if (e.keyCode === 32) {
                 // Spacebar (fire)
+                var audio = new Audio('../sounds/disparo.wav');
+                audio.play();
                 missiles.push({
                     left: hero.left + 20,
                     top: hero.top - 20
@@ -241,7 +243,7 @@
  							$("#img"+a).remove();
  						} else {
  							alert("Te quedaste sin vidas! :(");
- 							location.href ="pag.html";
+ 							location.href ="/1";
  						}
  						
                    	 } 
@@ -249,6 +251,13 @@
             }	  
             				
 			}
+
+            function win(){
+                if(enemies.length == 0){
+                    alert("Ganaste");
+                    location.href ="/1";
+                }
+            }
 
         function gameLoop() {
             setTimeout(gameLoop, 100);

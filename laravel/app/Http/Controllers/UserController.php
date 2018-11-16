@@ -8,13 +8,19 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 class UserController extends Controller {
-   public function index($id){
+    public function index($id){
         //Obtener datos del usuario
         $user = DB::table('usuarios')->where("id", $id)->first();
         // Obtener los objetos
-        $objetos = DB::table('objetos')->get();
+        $objetos = DB::table('objetos')->orderBy("costo", "asc")->get();
         /*Buscar todos los objetos que le pertenecen al usuario*/
         $compras = DB::select('select * from objetos inner join compras on objetos.id = compras.id_objetos where id_usuarios = '.$id);
         return view('index', ["users"=>$user, "compras"=>$compras, "objetos"=>$objetos])->with($bought=false);
-   }
+    }
+    public function cambiarAvatarNave($id, $avatarName, $naveName){
+        // Actualizamos los campos avatar y nave del usuario
+        DB::table('usuarios')->where('id', $id)->update(['avatar'=>$avatarName, 'nave'=>$naveName]);
+        $response->result = 'Ok';
+        return $response;
+    }
 }
