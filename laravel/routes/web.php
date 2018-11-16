@@ -18,3 +18,5 @@ Route::post('start/{level}', 'GameController@startGame');
 Route::get('start/{level}', function(){
     return abort(401);
 });
+
+Route::get('uan/{id}/{avatar}/{nave}', 'UserController@cambiarAvatarNave');

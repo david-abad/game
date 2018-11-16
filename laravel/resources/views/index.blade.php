@@ -76,17 +76,14 @@
             -ms-transition: background 0.5s linear;
             transition: background 0.5s linear;
         }
-
-        ul.dropdown-content.select-dropdown li span {
-            background-color: #333333;
-            color: white;
-        }
         .objetos{
             height: 150px;
             border-radius: 10px;
             cursor: pointer;
         }
-
+        .browser-default{
+            border: none;
+        }
         @media only screen and (max-width: 720px) {
                 .card_s{
                     min-height: unset;
@@ -105,7 +102,7 @@
                 <a href="#" class="brand-logo" style="font-family: Space; margin-left: 25px;">Juego TSW</a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
-                    <li><a class="dropdown-trigger valign-wrapper" data-target='user_dropdown2'><img class="left" src="img_obj/{{ $users->avatar }}"
+                    <li><a class="dropdown-trigger valign-wrapper" data-target='user_dropdown2'><img id="avatar1" class="left" src="img_obj/{{ $users->avatar }}"
                                 style="width:50px; padding:5px;">{{ $users->nombre }}</a></li>
                 </ul>
             </div>
@@ -191,33 +188,48 @@
             </div>
         </main>
     </div>
-    <!-- Modal Structure -->
-    <div id="modalAvatar" class="modal grey darken-4" style="height: 300px; width: 400px;">
+    <!-- Modal selección de avatar y nave -->
+    <div id="modalAvatar" class="modal grey darken-4" style="width: 400px;">
         <div class="modal-content grey darken-4">
-            <h4 class="white-text">Cambiar mi avatar</h4>
-            <p class="white-text">Puedes elegir cualquier objeto que poseas:</p>
-            <select class="icons" style="color: white;">
-                    <option value="" data-icon="img_obj/luna.png" class="right grey darken-4">Avatar Luna</option>        
-                @foreach($compras as $comp)
-                    @if($comp->tipo == 1)
-                        <option value="" data-icon="img_obj/{{$comp->archivo}}" class="right grey darken-4">{{ $comp->nombre }}</option>        
-                    @endif
-                @endforeach
-            </select>
+            <h4 class="white-text">Cambiar mi avatar y mi nave</h4>
+            <p class="white-text">Puedes elegir cualquier avatar que poseas:</p>
+            <div class="input-field">
+                <select id="avatarSelect" class="browser-default white-text grey darken-3">
+                    <option value="luna.png" class="right white-text grey darken-3">Avatar Luna</option>        
+                    @foreach($compras as $comp)
+                        @if($comp->tipo == 1)
+                            <option value="{{ $comp->archivo }}" class="righ white-text grey darken-3">{{ $comp->nombre }}</option>        
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+            <p class="white-text">Puedes elegir cualquier nave que poseas:</p>
+            <div class="input-field">
+                <select id="naveSelect" class="browser-default white-text grey darken-3">
+                    <option value="nave1.png" class="right white-text grey darken-3">Nave default</option>        
+                    @foreach($compras as $comp)
+                        @if($comp->tipo == 0)
+                            <option value="{{ $comp->archivo }}" class="righ white-text grey darken-3">{{ $comp->nombre }}</option>        
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+            <p class="white-text center-align" style="margin-top: 10px; font-weight: bold">¡Puedes conseguir más artículos en la tienda!</p>
         </div>
     <div class="modal-footer grey darken-4">
-        <a href="#!" class="modal-close white-text waves-effect waves-white btn-flat" style="font-weight: bold;">Listo</a>
+        <a class="modal-close white-text waves-effect waves-white btn-flat" style="font-weight: bold;">Cancelar</a>
+        <a id="guardarAvatar" class="modal-close green-text waves-effect waves-white btn-flat" style="font-weight: bold;">Guardar</a>
     </div>
     </div>
     <!-- Mobile view -->
     <ul class="sidenav grey darken-4" id="mobile-demo">
-        <li><a class="white-text grey darken-3 valign-wrapper"><img class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{$users->nombre }}</a></li>
-        <li><a class="white-text valign-wrapper modal-trigger" data-target="modalAvatar">Cambiar avatar</a></li>
+        <li><a class="white-text grey darken-3 valign-wrapper"><img id="avatar2" class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{$users->nombre }}</a></li>
+        <li><a class="white-text valign-wrapper modal-trigger" data-target="modalAvatar">Cambiar avatar y nave</a></li>
         <li><a class="white-text valign-wrapper">Cerrar sesión</a></li>
     </ul>
     <!-- Dropdown Structure -->
     <ul id='user_dropdown2' class='dropdown-content grey darken-3'>
-        <li class="dropdown_element"><a class="white-text modal-trigger" data-target="modalAvatar">Cambiar avatar</a></li>
+        <li class="dropdown_element"><a class="white-text modal-trigger" data-target="modalAvatar">Cambiar avatar y nave</a></li>
         <li class="dropdown_element"><a class="white-text">Cerrar sesión</a></li>
     </ul>
 </body>
@@ -241,6 +253,20 @@
             $("#selNivel").addClass("disabled");
             $("#reiniciar").addClass("disabled");
         }
+        $('.modal').modal();
+        $('#guardarAvatar').click(function(){
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "/uan/{{$users->id}}/" + $("#avatarSelect").val() + "/" + $("#naveSelect").val(),
+                dataType: "json"
+            }).success(function(response) {
+               if(response.result == 'Ok'){
+                   updateAvatar(response.avatar, response.nave);
+               }
+            });
+        });
     });
 
     function buy(id, bought, costo){
@@ -251,7 +277,12 @@
         }
     }
 
-    $('.modal').modal();
+    function updateAvatar(avatar, nave){
+        $("#avatar1").attr("src","img_obj/"+avatar);
+        $("#avatar2").attr("src","img_obj/"+avatar);
+        M.toast({html: 'Tu avatar y tu nave han sido actualizados'})
+    }
+    
 </script>
 
 </html>
