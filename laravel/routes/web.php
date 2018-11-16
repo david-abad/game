@@ -13,4 +13,8 @@
 
 Route::get('/{id}', 'UserController@index');
 
-Route::get('start/{level}', 'GameController@startGame');
+Route::post('start/{level}', 'GameController@startGame');
+
+Route::get('start/{level}', function(){
+    return abort(401);
+});

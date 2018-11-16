@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -20,6 +21,7 @@
             overflow-x: hidden;
             
         }
+        /* Checando que esto funcione */
         @font-face {
         font-family: Space;
         src: url('SPACEBAR.ttf');
@@ -75,6 +77,11 @@
             -ms-transition: background 0.5s linear;
             transition: background 0.5s linear;
         }
+
+        ul.dropdown-content.select-dropdown li span {
+            background-color: #333333;
+            color: white;
+        }
         .objetos{
             height: 150px;
             border-radius: 10px;
@@ -112,7 +119,10 @@
                     <div class="card_s card grey darken-4" style="margin-top: 25px;">
                         <div class="card-content white-text" style="width: 100%;">
                             <span class="card-title">Jugar</span>
-                            <a id="startGame" class="waves-effect green accent-4 btn btn-juego">Comenzar juego</a>
+                            <form action="/start/{{$users->nivelActual}}" enctype="multipart/form-data" method="post">
+                                {{csrf_field()}}    
+                                <button id="startGame" type="submit" class="waves-effect green accent-4 btn btn-juego">Comenzar juego</button>
+                            </form>
                             <a id="selNivel" class="waves-effect indigo accent-3 btn btn-juego">Seleccionar nivel</a>
                             <a class="waves-effect white btn btn-juego" style="color: #3B5998;"><img src="https://img.icons8.com/material/50/3b5998/facebook-f.png"
                                     class="material-icons left" style="width: 25px; margin-top: 5px;">Compartir</a>
@@ -155,7 +165,7 @@
                                                 <div class="col s6 m3 l3 hoverable objetos" onclick="buy({{$tmp->id}}, {{$bought}}, {{$tmp->costo}})" style="margin: 0px;">
                                                     <div class="col-content center-align">
                                                         @if($bought)
-                                                        <img class="" src="img_obj/bought.png" style="height: 80px; margin-top: 5px;">
+                                                        <img class="" src="img_obj/bought/{{ $tmp->archivo }}" style="height: 80px; margin-top: 5px;">
                                                         @else
                                                         <img class="" src="img_obj/{{ $tmp->archivo }}" style="height: 80px; margin-top: 5px;">
                                                         @endif
@@ -182,16 +192,33 @@
             </div>
         </main>
     </div>
+    <!-- Modal Structure -->
+    <div id="modalAvatar" class="modal grey darken-4" style="height: 300px; width: 400px;">
+        <div class="modal-content grey darken-4">
+            <h4 class="white-text">Cambiar mi avatar</h4>
+            <p class="white-text">Puedes elegir cualquier objeto que poseas:</p>
+            <select class="icons" style="color: white;">
+                    <option value="" data-icon="img_obj/luna.png" class="right grey darken-4">Avatar Luna</option>        
+                @foreach($compras as $comp)
+                    @if($comp->tipo == 1)
+                        <option value="" data-icon="img_obj/{{$comp->archivo}}" class="right grey darken-4">{{ $comp->nombre }}</option>        
+                    @endif
+                @endforeach
+            </select>
+        </div>
+    <div class="modal-footer grey darken-4">
+        <a href="#!" class="modal-close white-text waves-effect waves-white btn-flat" style="font-weight: bold;">Listo</a>
+    </div>
+    </div>
     <!-- Mobile view -->
     <ul class="sidenav grey darken-4" id="mobile-demo">
-        <li><a class="white-text grey darken-3 valign-wrapper"><img class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{
-                $users->nombre }}</a></li>
-        <li><a class="white-text valign-wrapper">Cambiar avatar</a></li>
+        <li><a class="white-text grey darken-3 valign-wrapper"><img class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{$users->nombre }}</a></li>
+        <li><a class="white-text valign-wrapper modal-trigger" data-target="modalAvatar">Cambiar avatar</a></li>
         <li><a class="white-text valign-wrapper">Cerrar sesión</a></li>
     </ul>
     <!-- Dropdown Structure -->
     <ul id='user_dropdown2' class='dropdown-content grey darken-3'>
-        <li class="dropdown_element"><a class="white-text">Cambiar avatar</a></li>
+        <li class="dropdown_element"><a class="white-text modal-trigger" data-target="modalAvatar">Cambiar avatar</a></li>
         <li class="dropdown_element"><a class="white-text">Cerrar sesión</a></li>
     </ul>
 </body>
@@ -199,6 +226,11 @@
 <script type="text/javascript" src="js/materialize.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         $('.dropdown-trigger').dropdown({
             constrainWidth: false,
             closeOnClick: false,
@@ -210,9 +242,6 @@
             $("#selNivel").addClass("disabled");
             $("#reiniciar").addClass("disabled");
         }
-        $("#startGame").click(function(){
-            window.open("/start/1", "_blank");
-        });
     });
 
     function buy(id, bought, costo){
@@ -222,6 +251,8 @@
             alert("Este producto ya lo adquiriste");
         }
     }
+
+    $('.modal').modal();
 </script>
 
 </html>
