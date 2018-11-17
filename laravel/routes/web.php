@@ -20,3 +20,4 @@ Route::get('start/{level}/{user_id}', function(){
 });
 
 Route::get('uan/{id}/{avatar}/{nave}', 'UserController@cambiarAvatarNave');
+Route::post('ul/{id}/{nivel}', 'UserController@subirDeNivel');

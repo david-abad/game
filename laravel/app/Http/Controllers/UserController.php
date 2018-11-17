@@ -26,4 +26,16 @@ class UserController extends Controller {
         $response->nave = $nave;
         echo json_encode($response);
     }
+    public function subirDeNivel($id, $nivel){
+        // Obtenemos los datos del usuario
+        $usuario = DB::table('usuarios')->where('id', $id)->first();
+        if($usuario->nivelActual == $nivel){
+            // Si es la primera vez que gana este nivel, subimos de nivel
+            DB::table('usuarios')->where('id', $id)->update(['nivelActual'=>$nivel+1]);
+        }
+        DB::table('usuarios')->where('id', $id)->increment('creditos', $nivel*10);
+        $response = new \stdClass(); //Para evitar error: Creating default object from empty value
+        $response->result = 'Ok';
+        echo json_encode($response);
+    }
 }

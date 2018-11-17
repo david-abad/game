@@ -5,7 +5,7 @@
     <title>Space Invaders</title>
     <link rel="stylesheet" href="/../css/styleLvl1.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 </head>
 
 <body>
@@ -21,10 +21,18 @@
         9. enemy objects / enemy movement
         10. collision detection
     -->
+    <div id="ganaste" class="fin">
+        <h1>¡Ganaste!</h1>
+        <p>Recibiste 10 créditos</p>
+    </div>
+    <div id="perdiste" class="fin">
+        <h1>Has perdido</h1>
+    </div>
     <div id="background">
         <div id="hero"></div>
         <div id="missiles"></div>
         <div id="enemies"></div>
+        
         <div class="centered">
             <img id="img3" src="/../lvl1/vida.png" class="imgz"/>
             <img id="img2" src="/../lvl1/vida.png" class="imgz"/>
@@ -35,7 +43,9 @@
 
     <script>
         var audio = new Audio('/../sounds/lvl1.mp3');
-        audio.play();
+        $("#ganaste").hide();
+        $("#perdiste").hide();
+        // audio.play();
 
         var hero = {
             left: 575,
@@ -145,7 +155,7 @@
             }
             if (e.keyCode === 32) {
                 // Spacebar (fire)
-                var audio = new Audio('/../sounds/disparo.wav');
+                var audio = new Audio('/../sounds/disparo.mp3');
                 audio.play();
                 missiles.push({
                     left: hero.left + 20,
@@ -210,6 +220,11 @@
                     ) {
                         enemies.splice(enemy, 1);
                         missiles.splice(missiles, 1);
+                        var audio = new Audio('/../sounds/destruirEnemigo.wav');
+                        audio.play();
+                        if(enemies.length == 0){
+                            win();
+                        }
                     }
                 }
             }
@@ -245,9 +260,10 @@
  						//alert(a);
  						if (a > 0){
  							$("#img"+a).remove();
+                             var audio = new Audio('/../sounds/perderVida.wav');
+                             audio.play();
  						} else {
- 							alert("Te quedaste sin vidas! :(");
- 							location.href ="/{{$user}}";
+ 							perder();
  						}
  						
                    	 } 
@@ -257,9 +273,36 @@
 			}
 
             function win(){
-                if(enemies.length == 0){
-                    alert("Ganaste");
-                    location.href ="/{{$user}}";
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "/ul/{{$user}}/1",
+                    dataType: "json",
+                    method: "post"
+                }).success(function(response) {
+                    if(response.result == 'Ok'){
+                        var audio = new Audio('/../sounds/ganar.wav');
+                        $( "#ganaste" ).fadeIn( "slow", function() {
+                            // Animation complete
+                        });
+                        audio.play();
+                        audio.onended = function(){
+                            window.open("/{{$user}}", "_self");
+                        }
+                        
+                    }
+                });
+            }
+
+            function perder(){
+                var audio = new Audio('/../sounds/perder.wav');
+                $( "#perdiste" ).fadeIn( "slow", function() {
+                    // Animation complete
+                });
+                audio.play();
+                audio.onended = function(){
+                    window.open("/{{$user}}", "_self");
                 }
             }
 
@@ -271,7 +314,6 @@
             drawEnemies();
             collisionDetection();
             collisionDetectionNave();
-            win();
         }
 
         gameLoop()
