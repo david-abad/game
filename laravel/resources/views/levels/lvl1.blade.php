@@ -1,9 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <title>Space Invaders</title>
-    <link rel="stylesheet" href="../css/styleLvl1.css">
+    <link rel="stylesheet" href="/../css/styleLvl1.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 
@@ -25,15 +26,15 @@
         <div id="missiles"></div>
         <div id="enemies"></div>
         <div class="centered">
-            <img id="img3" src="../lvl1/vida.png" class="imgz"/>
-            <img id="img2" src="../lvl1/vida.png" class="imgz"/>
-            <img id="img1" src="../lvl1/vida.png" class="imgz"/>
-            <img id="img0" src="../lvl1/vida.png" class="imgz"/>
+            <img id="img3" src="/../lvl1/vida.png" class="imgz"/>
+            <img id="img2" src="/../lvl1/vida.png" class="imgz"/>
+            <img id="img1" src="/../lvl1/vida.png" class="imgz"/>
+            <img id="img0" src="/../lvl1/vida.png" class="imgz"/>
         </div>
     </div>
 
     <script>
-        var audio = new Audio('../sounds/lvl1.mp3');
+        var audio = new Audio('/../sounds/lvl1.mp3');
         audio.play();
 
         var hero = {
@@ -144,7 +145,7 @@
             }
             if (e.keyCode === 32) {
                 // Spacebar (fire)
-                var audio = new Audio('../sounds/disparo.wav');
+                var audio = new Audio('/../sounds/disparo.wav');
                 audio.play();
                 missiles.push({
                     left: hero.left + 20,
@@ -258,7 +259,7 @@
             function win(){
                 if(enemies.length == 0){
                     alert("Ganaste");
-                    location.href ="/";
+                    location.href ="/{{$user}}";
                 }
             }
 
