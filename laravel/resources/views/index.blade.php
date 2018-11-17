@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="theme-color" content="#212121" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--Import Google Icon Font-->
@@ -92,6 +93,12 @@
                     width: 161px !important;
                 }
         }
+        @media only screen and (max-width: 520px) {
+                .brand-logo{
+                    font-size: 22px !important;
+                    margin-left: -10px !important;
+                }
+        }
     </style>
 </head>
 
@@ -115,11 +122,11 @@
                     <div class="card_s card grey darken-4" style="margin-top: 25px;">
                         <div class="card-content white-text" style="width: 100%;">
                             <span class="card-title">Jugar</span>
-                            <form action="/start/{{$users->nivelActual}}" enctype="multipart/form-data" method="post">
+                            <form action="/start/{{$users->nivelActual}}/{{$users->id}}" enctype="multipart/form-data" method="post">
                                 {{csrf_field()}}    
                                 <button id="startGame" type="submit" class="waves-effect green accent-4 btn btn-juego">Comenzar juego</button>
                             </form>
-                            <a id="selNivel" class="waves-effect indigo accent-3 btn btn-juego">Seleccionar nivel</a>
+                            <a id="selNivel" class="waves-effect indigo accent-3 btn btn-juego modal-trigger" data-target="modalNiveles">Seleccionar nivel</a>
                             <a class="waves-effect white btn btn-juego" style="color: #3B5998;"><img src="https://img.icons8.com/material/50/3b5998/facebook-f.png"
                                     class="material-icons left" style="width: 25px; margin-top: 5px;">Compartir</a>
                           <a class="btn-flat btn-juego" style="cursor: default;"></a>
@@ -221,9 +228,29 @@
         <a id="guardarAvatar" class="modal-close green-text waves-effect waves-white btn-flat" style="font-weight: bold;">Guardar</a>
     </div>
     </div>
+    <!-- Modal selección de nivel -->
+    <div id="modalNiveles" class="modal grey darken-4 modal-fixed-footer" style="width: 400px;">
+        <div class="modal-content grey darken-4">
+            <h4 class="white-text">Seleccionar nivel</h4>
+            <p class="white-text">Puedes volver a jugar culquier nivel que ya hayas superado. Tu progreso no se perderá.</p>
+            @for($i=1;$i<11;$i++)
+                @if($i <= $users->nivelActual)
+                <form action="/start/{{$i}}/{{$users->id}}" enctype="multipart/form-data" method="post">
+                    {{csrf_field()}}
+                    <button id="startGame" type="submit" class="waves-effect green darken-1 btn" style="width: 100%; margin: 5px;">Nivel {{$i}}</button>
+                </form>
+                @else
+                <a class="waves-effect grey darken-2 btn" style="width: 100%; margin: 5px;"><i class="material-icons">lock</i></a>
+                @endif
+            @endfor
+        </div>
+    <div class="modal-footer fixed grey darken-4">
+        <a class="modal-close white-text waves-effect waves-white btn-flat" style="font-weight: bold;">Cerrar</a>
+    </div>
+    </div>
     <!-- Mobile view -->
     <ul class="sidenav grey darken-4" id="mobile-demo">
-        <li><a class="white-text grey darken-3 valign-wrapper"><img id="avatar2" class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{$users->nombre }}</a></li>
+        <li><a class="white-text indigo darken-3 valign-wrapper"><img id="avatar2" class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{$users->nombre }}</a></li>
         <li><a class="white-text valign-wrapper modal-trigger" data-target="modalAvatar">Cambiar avatar y nave</a></li>
         <li><a class="white-text valign-wrapper">Cerrar sesión</a></li>
     </ul>
@@ -250,8 +277,8 @@
         $('select').formSelect();
         $('.sidenav').sidenav();
         if ({{ $users->nivelActual }} == 1) {
-            $("#selNivel").addClass("disabled");
-            $("#reiniciar").addClass("disabled");
+            $("#selNivel").hide();
+            $("#reiniciar").hide();
         }
         $('.modal').modal();
         $('#guardarAvatar').click(function(){
