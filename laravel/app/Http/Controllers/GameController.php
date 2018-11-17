@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 
 class GameController extends Controller
 {
-    public function startGame($level){
+    public function startGame($level, $user_id){
         $levelToLoad = "/levels/lvl".$level;
-        return view($levelToLoad);
+        return view($levelToLoad, ['user'=>$user_id]);
     }
 }

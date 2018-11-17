@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="theme-color" content="#212121" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--Import Google Icon Font-->
@@ -77,23 +78,26 @@
             -ms-transition: background 0.5s linear;
             transition: background 0.5s linear;
         }
-
-        ul.dropdown-content.select-dropdown li span {
-            background-color: #333333;
-            color: white;
-        }
         .objetos{
             height: 150px;
             border-radius: 10px;
             cursor: pointer;
         }
-
+        .browser-default{
+            border: none;
+        }
         @media only screen and (max-width: 720px) {
                 .card_s{
                     min-height: unset;
                 }
                 .objetos{
                     width: 161px !important;
+                }
+        }
+        @media only screen and (max-width: 520px) {
+                .brand-logo{
+                    font-size: 22px !important;
+                    margin-left: -10px !important;
                 }
         }
     </style>
@@ -106,7 +110,7 @@
                 <a href="#" class="brand-logo" style="font-family: Space; margin-left: 25px;">Juego TSW</a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
-                    <li><a class="dropdown-trigger valign-wrapper" data-target='user_dropdown2'><img class="left" src="img_obj/{{ $users->avatar }}"
+                    <li><a class="dropdown-trigger valign-wrapper" data-target='user_dropdown2'><img id="avatar1" class="left" src="img_obj/{{ $users->avatar }}"
                                 style="width:50px; padding:5px;">{{ $users->nombre }}</a></li>
                 </ul>
             </div>
@@ -119,11 +123,11 @@
                     <div class="card_s card grey darken-4" style="margin-top: 25px;">
                         <div class="card-content white-text" style="width: 100%;">
                             <span class="card-title">Jugar</span>
-                            <form action="/start/{{$users->nivelActual}}" enctype="multipart/form-data" method="post">
+                            <form action="/start/{{$users->nivelActual}}/{{$users->id}}" enctype="multipart/form-data" method="post">
                                 {{csrf_field()}}    
                                 <button id="startGame" type="submit" class="waves-effect green accent-4 btn btn-juego">Comenzar juego</button>
                             </form>
-                            <a id="selNivel" class="waves-effect indigo accent-3 btn btn-juego">Seleccionar nivel</a>
+                            <a id="selNivel" class="waves-effect indigo accent-3 btn btn-juego modal-trigger" data-target="modalNiveles">Seleccionar nivel</a>
                             <a class="waves-effect white btn btn-juego" style="color: #3B5998;"><img src="https://img.icons8.com/material/50/3b5998/facebook-f.png"
                                     class="material-icons left" style="width: 25px; margin-top: 5px;">Compartir</a>
                             <a class="btn-flat btn-juego" style="cursor: default;"></a>
@@ -192,33 +196,68 @@
             </div>
         </main>
     </div>
-    <!-- Modal Structure -->
-    <div id="modalAvatar" class="modal grey darken-4" style="height: 300px; width: 400px;">
+    <!-- Modal selección de avatar y nave -->
+    <div id="modalAvatar" class="modal grey darken-4" style="width: 400px;">
         <div class="modal-content grey darken-4">
-            <h4 class="white-text">Cambiar mi avatar</h4>
-            <p class="white-text">Puedes elegir cualquier objeto que poseas:</p>
-            <select class="icons" style="color: white;">
-                    <option value="" data-icon="img_obj/luna.png" class="right grey darken-4">Avatar Luna</option>        
-                @foreach($compras as $comp)
-                    @if($comp->tipo == 1)
-                        <option value="" data-icon="img_obj/{{$comp->archivo}}" class="right grey darken-4">{{ $comp->nombre }}</option>        
-                    @endif
-                @endforeach
-            </select>
+            <h4 class="white-text">Cambiar mi avatar y mi nave</h4>
+            <p class="white-text">Puedes elegir cualquier avatar que poseas:</p>
+            <div class="input-field">
+                <select id="avatarSelect" class="browser-default white-text grey darken-3">
+                    <option value="luna.png" class="right white-text grey darken-3">Avatar Luna</option>        
+                    @foreach($compras as $comp)
+                        @if($comp->tipo == 1)
+                            <option value="{{ $comp->archivo }}" class="righ white-text grey darken-3">{{ $comp->nombre }}</option>        
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+            <p class="white-text">Puedes elegir cualquier nave que poseas:</p>
+            <div class="input-field">
+                <select id="naveSelect" class="browser-default white-text grey darken-3">
+                    <option value="nave1.png" class="right white-text grey darken-3">Nave default</option>        
+                    @foreach($compras as $comp)
+                        @if($comp->tipo == 0)
+                            <option value="{{ $comp->archivo }}" class="righ white-text grey darken-3">{{ $comp->nombre }}</option>        
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+            <p class="white-text center-align" style="margin-top: 10px; font-weight: bold">¡Puedes conseguir más artículos en la tienda!</p>
         </div>
     <div class="modal-footer grey darken-4">
-        <a href="#!" class="modal-close white-text waves-effect waves-white btn-flat" style="font-weight: bold;">Listo</a>
+        <a class="modal-close white-text waves-effect waves-white btn-flat" style="font-weight: bold;">Cancelar</a>
+        <a id="guardarAvatar" class="modal-close green-text waves-effect waves-white btn-flat" style="font-weight: bold;">Guardar</a>
+    </div>
+    </div>
+    <!-- Modal selección de nivel -->
+    <div id="modalNiveles" class="modal grey darken-4 modal-fixed-footer" style="width: 400px;">
+        <div class="modal-content grey darken-4">
+            <h4 class="white-text">Seleccionar nivel</h4>
+            <p class="white-text">Puedes volver a jugar culquier nivel que ya hayas superado. Tu progreso no se perderá.</p>
+            @for($i=1;$i<11;$i++)
+                @if($i <= $users->nivelActual)
+                <form action="/start/{{$i}}/{{$users->id}}" enctype="multipart/form-data" method="post">
+                    {{csrf_field()}}
+                    <button id="startGame" type="submit" class="waves-effect green darken-1 btn" style="width: 100%; margin: 5px;">Nivel {{$i}}</button>
+                </form>
+                @else
+                <a class="waves-effect grey darken-2 btn" style="width: 100%; margin: 5px;"><i class="material-icons">lock</i></a>
+                @endif
+            @endfor
+        </div>
+    <div class="modal-footer fixed grey darken-4">
+        <a class="modal-close white-text waves-effect waves-white btn-flat" style="font-weight: bold;">Cerrar</a>
     </div>
     </div>
     <!-- Mobile view -->
     <ul class="sidenav grey darken-4" id="mobile-demo">
-        <li><a class="white-text grey darken-3 valign-wrapper"><img class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{$users->nombre }}</a></li>
-        <li><a class="white-text valign-wrapper modal-trigger" data-target="modalAvatar">Cambiar avatar</a></li>
+        <li><a class="white-text indigo darken-3 valign-wrapper"><img id="avatar2" class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{$users->nombre }}</a></li>
+        <li><a class="white-text valign-wrapper modal-trigger" data-target="modalAvatar">Cambiar avatar y nave</a></li>
         <li><a class="white-text valign-wrapper">Cerrar sesión</a></li>
     </ul>
     <!-- Dropdown Structure -->
     <ul id='user_dropdown2' class='dropdown-content grey darken-3'>
-        <li class="dropdown_element"><a class="white-text modal-trigger" data-target="modalAvatar">Cambiar avatar</a></li>
+        <li class="dropdown_element"><a class="white-text modal-trigger" data-target="modalAvatar">Cambiar avatar y nave</a></li>
         <li class="dropdown_element"><a class="white-text">Cerrar sesión</a></li>
     </ul>
 </body>
@@ -239,9 +278,23 @@
         $('select').formSelect();
         $('.sidenav').sidenav();
         if ({{ $users->nivelActual }} == 1) {
-            $("#selNivel").addClass("disabled");
-            $("#reiniciar").addClass("disabled");
+            $("#selNivel").hide();
+            $("#reiniciar").hide();
         }
+        $('.modal').modal();
+        $('#guardarAvatar').click(function(){
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "/uan/{{$users->id}}/" + $("#avatarSelect").val() + "/" + $("#naveSelect").val(),
+                dataType: "json"
+            }).success(function(response) {
+               if(response.result == 'Ok'){
+                   updateAvatar(response.avatar, response.nave);
+               }
+            });
+        });
     });
 
     function buy(id, bought, costo){
@@ -252,7 +305,12 @@
         }
     }
 
-    $('.modal').modal();
+    function updateAvatar(avatar, nave){
+        $("#avatar1").attr("src","img_obj/"+avatar);
+        $("#avatar2").attr("src","img_obj/"+avatar);
+        M.toast({html: 'Tu avatar y tu nave han sido actualizados'})
+    }
+    
 </script>
 
 </html>
