@@ -21,6 +21,13 @@
             max-width: 100%;
             overflow-x: hidden;
         }
+        body{
+            background-image: url("background.jpeg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
         /* Checando que esto funcione */
         @font-face {
         font-family: Space;
@@ -36,6 +43,10 @@
             text-shadow: 2px 2px black;
             font-size: 60px;
         }
+        .btn{
+            border-radius: 20px;
+            z-index: 0;
+        }
         .dropdown-content{
             width: 250px;
             right: 25px !important;
@@ -48,6 +59,7 @@
             background-color: #212121 !important;
         }
         .card_s{
+            border-radius: 10px;
             display: flex;
             flex-wrap: wrap;
             min-height: 80vh;
@@ -61,7 +73,7 @@
             margin-top: 25px;
         }
         .hoverable:hover{
-            background-color: rgb(76, 19, 150);
+            background-color: rgb(59, 0, 94);
             opacity: 1.0;
             -webkit-transition: background 0.2s linear;
             -moz-transition: background 0.2s linear;
@@ -99,12 +111,13 @@
                     margin-left: -10px !important;
                 }
         }
+        
     </style>
 </head>
 
 <body class="black">
     <header>
-        <nav class="grey darken-4 z-depth-0">
+        <nav class="z-depth-0" style="background: rgba(21, 21, 21, 0.9) !important;">
             <div class="nav-wrapper">
                 <a href="#" class="brand-logo" style="font-family: Space; margin-left: 25px;">Juego TSW</a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
@@ -119,9 +132,9 @@
         <main>
             <div class="row">
                 <div class="col s12 l4">
-                    <div class="card_s card grey darken-4" style="margin-top: 25px;">
+                    <div class="card_s card grey darken-4" style="margin-top: 25px; background: rgba(21, 21, 21, 0.9) !important;">
                         <div class="card-content white-text" style="width: 100%;">
-                            <span class="card-title">Jugar</span>
+                            <span class="card-title" style="font-size: 30px;">Jugar</span>
                             <form action="/start/{{$users->nivelActual}}/{{$users->id}}" enctype="multipart/form-data" method="post">
                                 {{csrf_field()}}    
                                 <button id="startGame" type="submit" class="waves-effect green accent-4 btn btn-juego">Comenzar juego</button>
@@ -130,16 +143,16 @@
                             <a class="waves-effect white btn btn-juego" style="color: #3B5998;"><img src="https://img.icons8.com/material/50/3b5998/facebook-f.png"
                                     class="material-icons left" style="width: 25px; margin-top: 5px;">Compartir</a>
                           <a class="btn-flat btn-juego" style="cursor: default;"></a>
-                            <a id="reiniciar" class="waves-effect red darken-3 btn btn-juego">Reiniciar</a>
+                            <a id="reiniciar" class="waves-effect red darken-3 btn btn-juego modal-trigger" data-target="modalReiniciar">Reiniciar</a>
                         </div>
                     </div>
                 </div>
                 <div class="col s12 l8">
-                    <div class="card_s card grey darken-4" style="margin-top: 25px;">
+                    <div class="card_s card grey darken-4" style="margin-top: 25px; background: rgba(21, 21, 21, 0.9) !important;">
                         <div class="card-content white-text">
                             <div class="row">
                                 <div class="col s12 l4">
-                                    <span class="card-title">Tienda</span>
+                                    <span class="card-title" style="font-size: 30px;">Tienda</span>
                                 </div>
                                 <div class="col s12 l3 offset-l5">
                                     <div class="row valign">
@@ -165,7 +178,7 @@
                                                         @php $bought=true; @endphp
                                                     @endif
                                                 @endforeach
-                                                <div class="col s6 m3 l3 hoverable objetos" onclick="buy({{$tmp->id}}, {{$bought}}, {{$tmp->costo}})" style="margin: 0px;">
+                                                <div class="col s6 m3 l3 hoverable objetos" onclick="buy({{$tmp->id}}, {{$bought}}, {{$tmp->costo}}, '{{$tmp->nombre}}', '{{$tmp->archivo}}')" style="margin: 0px;">
                                                     <div class="col-content center-align">
                                                         @if($bought)
                                                         <img class="" src="img_obj/bought/{{ $tmp->archivo }}" style="height: 80px; margin-top: 5px;">
@@ -178,7 +191,7 @@
                                                                 <img src="coins.png" style="width: 25px;">
                                                             </div>
                                                             <div class="col s9 left-align" style="font-weight: bold; font-size: 18px;">
-                                                                <p> {{ $tmp->costo }} </p>
+                                                                <p style="margin-top: -2px;"> {{ $tmp->costo }} </p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -232,12 +245,12 @@
     <div id="modalNiveles" class="modal grey darken-4 modal-fixed-footer" style="width: 400px;">
         <div class="modal-content grey darken-4">
             <h4 class="white-text">Seleccionar nivel</h4>
-            <p class="white-text">Puedes volver a jugar culquier nivel que ya hayas superado. Tu progreso no se perderá.</p>
+            <p class="white-text">Puedes volver a jugar cualquier nivel que ya hayas superado. Tu progreso no se verá afectado.</p>
             @for($i=1;$i<11;$i++)
                 @if($i <= $users->nivelActual)
                 <form action="/start/{{$i}}/{{$users->id}}" enctype="multipart/form-data" method="post">
                     {{csrf_field()}}
-                    <button id="startGame" type="submit" class="waves-effect green darken-1 btn" style="width: 100%; margin: 5px;">Nivel {{$i}}</button>
+                    <button id="startGame" type="submit" class="waves-effect indigo accent-3 btn" style="width: 100%; margin: 5px;">Nivel {{$i}}</button>
                 </form>
                 @else
                 <a class="waves-effect grey darken-2 btn" style="width: 100%; margin: 5px;"><i class="material-icons">lock</i></a>
@@ -247,6 +260,31 @@
     <div class="modal-footer fixed grey darken-4">
         <a class="modal-close white-text waves-effect waves-white btn-flat" style="font-weight: bold;">Cerrar</a>
     </div>
+    </div>
+    <!-- Modal reiniciar -->
+    <div id="modalReiniciar" class="modal grey darken-4 modal-fixed-footer" style="width: 400px; height: 250px;">
+        <div class="modal-content grey darken-4">
+            <h4 class="white-text">¿Estás seguro?</h4>
+            <p class="white-text">Perderás todo tu progreso pero no tus artículos adquiridos ni tus créditos acumulados.</p>
+        </div>
+        <div class="modal-footer fixed grey darken-4">
+            <a class="modal-close white-text waves-effect waves-white btn-flat" style="font-weight: bold;">Cancelar</a>
+            <a id="btnReiniciar" class="modal-close red-text waves-effect waves-white btn-flat" style="font-weight: bold;">Reiniciar progreso</a>
+        </div>
+    </div>
+    <!-- Modal comprar -->
+    <div id="modalComprar" class="modal grey darken-4 modal-fixed-footer" style="width: 400px;">
+        <div class="modal-content grey darken-4">
+            <h4 class="white-text">Comprar artículo</h4>
+            <p id="producto" class="white-text"></p>
+            <div class="center-align">
+                <img class="center-align" id="compraImg" src="" style="height: 200px; margin-top: 25px;">
+            </div>
+        </div>
+        <div class="modal-footer fixed grey darken-4">
+            <a class="modal-close white-text waves-effect waves-white btn-flat" style="font-weight: bold;">Cancelar</a>
+            <a id="btnComprar" class="modal-close green-text waves-effect waves-white btn-flat" style="font-weight: bold;">Comprar</a>
+        </div>
     </div>
     <!-- Mobile view -->
     <ul class="sidenav grey darken-4" id="mobile-demo">
@@ -294,20 +332,59 @@
                }
             });
         });
+        $("#btnReiniciar").click(function(){
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "/re/{{$users->id}}/",
+                dataType: "json"
+            }).success(function(response) {
+                if(response.result == 'Ok'){
+                    $("#selNivel").hide();
+                    $("#reiniciar").hide();
+                    M.toast({html: 'Tu progreso ha sido reiniciado'});
+                    location.reload();
+                }
+            });
+        });
     });
 
-    function buy(id, bought, costo){
+    function buy(id, bought, costo, nombre, archivo){
         if(bought!=1){
-            alert("Cuesta " + costo + " créditos");
+            var instance = M.Modal.getInstance($("#modalComprar"));
+            $("#producto").text("Comprar " + nombre + " por " + costo + " créditos");
+            $("#compraImg").attr('src', "img_obj/" + archivo);
+            $("#btnComprar").click(function(){
+                if(costo <= {{$users->creditos}}){
+                    // Efectuar la compra
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: "/com/{{$users->id}}/"+id,
+                        dataType: "json"
+                    }).success(function(response) {
+                        if(response.result == 'Ok'){
+                            M.toast({html: 'Has comprado ' + nombre + ' con éxito'});
+                            location.reload();
+                        }
+                    });
+                }else{
+                    instance.close();
+                    M.toast({html: 'No tienes los créditos suficientes'});
+                }
+            });
+            instance.open();
         }else{
-            alert("Este producto ya lo adquiriste");
+            M.toast({html: 'Este producto ya lo compraste'});
         }
     }
 
     function updateAvatar(avatar, nave){
         $("#avatar1").attr("src","img_obj/"+avatar);
         $("#avatar2").attr("src","img_obj/"+avatar);
-        M.toast({html: 'Tu avatar y tu nave han sido actualizados'})
+        M.toast({html: 'Tu avatar y tu nave han sido actualizados'});
     }
     
 </script>

@@ -201,9 +201,9 @@
             for (var i = 0; i < enemies.length; i++) {
                
                 if (enemies[i].top >= 650) {
-                	enemies[i].top = -50;
+                	enemies[i].top = -80;
                 } else {
-                	enemies[i].top = enemies[i].top + 8;
+                	enemies[i].top = enemies[i].top + 10;
                 }
                 
             }
