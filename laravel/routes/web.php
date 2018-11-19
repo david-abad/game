@@ -21,3 +21,5 @@ Route::get('start/{level}/{user_id}', function(){
 
 Route::get('uan/{id}/{avatar}/{nave}', 'UserController@cambiarAvatarNave');
 Route::post('ul/{id}/{nivel}', 'UserController@subirDeNivel');
+Route::get('re/{id}', 'UserController@reiniciar');
+Route::get('com/{id}/{id_obj}', 'UserController@comprar');

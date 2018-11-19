@@ -38,4 +38,24 @@ class UserController extends Controller {
         $response->result = 'Ok';
         echo json_encode($response);
     }
+    public function reiniciar($id){
+        //Asignamos a 1 el nivel actual del usuario
+        DB::table('usuarios')->where('id', $id)->update(['nivelActual'=>1]);
+        $response = new \stdClass(); //Para evitar error: Creating default object from empty value
+        $response->result = 'Ok';
+        echo json_encode($response);
+    }
+    public function comprar($id, $id_obj){
+        // Buscamos el objeto al que pertenece el id_obj
+        $objeto = DB::table('objetos')->where('id', $id_obj)->first();
+        // Actualizamos el número de créditos del usuario
+        DB::table('usuarios')->where('id', $id)->decrement('creditos', $objeto->costo);
+        // Insertamos la compra del objeto
+        DB::table('compras')->insert(
+            ['id_usuarios' => $id, 'id_objetos' => $id_obj]
+        );
+        $response = new \stdClass(); //Para evitar error: Creating default object from empty value
+        $response->result = 'Ok';
+        echo json_encode($response);
+    }
 }
