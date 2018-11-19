@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
+   
+    
 <body>
     <!--
         1. HTML
@@ -19,11 +21,13 @@
         9. enemy objects / enemy movement
         10. collision detection
     -->
-    <div id="background">
+    <div id="vidas">Numero de vidas 3</div>
+   
+   <div id="background"> 
         <div id="hero"></div>
         <div id="missiles"></div>
         <div id="enemies"></div>
-        <div id="vidas"></div>
+        
     </div>
 
     <script>
@@ -203,10 +207,14 @@
                     ) {
                         
                     	enemies.splice(enemy, 1);
-                        document.getElementById('hero').style.display = "none";
-                       alert("Eres un pendejo ya perdiste");
+                        document.getElementById('vidas').innerHTML ="Numero de vidas " + contador;
+                        alert("Perdiste te quedan " +contador +" vida\(s\)");
+                        decrementar();
+                      
+                       
+                        
                     
-                   	 }
+                   	 }  
                 
             }
             
@@ -214,19 +222,38 @@
             				
 			}
         
+        
+        
+        
+        var contador=2; 
+            function decrementar() { 
+            if(contador==0) {  
+               // document.getElementById('hero').style.display = "none";
+               alert('Has sido derrotado, preciona aceptar para reiniciar el Juego'); 
+               location.reload();
+            }
+            
+            else { 
+            contador--;
+            } 
+            }           
+                    
 
         function gameLoop() {
-            setTimeout(gameLoop, 50);
+            setTimeout(gameLoop, 100);
             moveMissiles();
             drawMissiles();
             moveEnemies();
             drawEnemies();
             collisionDetection();
             collisionDetectionNave();
+            
         }
 
         gameLoop()
     </script>
+    
+ 
     
 </body>
 
