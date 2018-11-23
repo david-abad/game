@@ -49,7 +49,7 @@
 
         var hero = {
             left: 575,
-            top: 500
+            top: 580
         };
        
         var a = 4;
@@ -94,46 +94,6 @@
                 left: 900,
                 //right: 900,
                 top: 100
-            },
-            {
-                left: 200,
-                //right: 200,
-                top: 175
-            },
-            {
-                left: 300,
-                //right: 300,
-                top: 175
-            },
-            {
-                left: 400,
-                //right: 400,
-                top: 175
-            },
-            {
-                left: 500,
-                //right: 500,
-                top: 175
-            },
-            {
-                left: 600,
-                //right: 600,
-                top: 175
-            },
-            {
-                left: 700,
-                //right: 700,
-                top: 175
-            },
-            {
-                left: 800,
-                //right: 800,
-                top: 175
-            },
-            {
-                left: 900,
-                //right: 900,
-                top: 175
             }
         ];
 
@@ -203,7 +163,7 @@
                 if (enemies[i].top >= 650) {
                 	enemies[i].top = -80;
                 } else {
-                	enemies[i].top = enemies[i].top + 10;
+                	enemies[i].top = enemies[i].top + 5;
                 }
                 
             }
@@ -235,27 +195,12 @@
         	
         	for (var enemy = 0; enemy < enemies.length; enemy++) {
             	if (
-                        /*hero.left >= enemies[enemy].left -10 &&
+                       	hero.left >= (enemies[enemy].left -50) &&
                         hero.left <= (enemies[enemy].left + 50) &&
                         hero.top <= (enemies[enemy].top + 50) &&
-                        hero.top >= enemies[enemy].top +10 */
-                       	(hero.left >= (enemies[enemy].left -10) &&
-                        hero.left <= (enemies[enemy].left + 50) &&
-                        hero.top <= (enemies[enemy].top + 50) &&
-                        hero.top >= (enemies[enemy].top +10) )
-                        ||
-                        (	
-                        	hero.left <= (enemies[enemy].left -10) &&
-                        hero.left >= (enemies[enemy].left + 40) &&
-                        hero.top >= (enemies[enemy].top + 100) &&
-                        hero.top <= (enemies[enemy].top +100)
-                        	)
-
+                        hero.top >= (enemies[enemy].top +40)
                     ) { 
-            			//alert(hero.left );
                     	enemies.splice(enemy, 1);
-                    
-                       
                         a--;
  						//alert(a);
  						if (a > 0){
