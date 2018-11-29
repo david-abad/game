@@ -23,7 +23,7 @@
     -->
     <div id="ganaste" class="fin">
         <h1>¡Ganaste!</h1>
-        <p>Recibiste 10 créditos</p>
+        <p>Recibiste 15 créditos</p>
     </div>
     <div id="perdiste" class="fin">
         <h1>Has perdido</h1>
@@ -94,6 +94,46 @@
                 left: 900,
                 //right: 900,
                 top: 100
+            },
+            {
+                left: 200,
+                //right: 200,
+                top: 175
+            },
+            {
+                left: 300,
+                //right: 300,
+                top: 175
+            },
+            {
+                left: 400,
+                //right: 400,
+                top: 175
+            },
+            {
+                left: 500,
+                //right: 500,
+                top: 175
+            },
+            {
+                left: 600,
+                //right: 600,
+                top: 175
+            },
+            {
+                left: 700,
+                //right: 700,
+                top: 175
+            },
+            {
+                left: 800,
+                //right: 800,
+                top: 175
+            },
+            {
+                left: 900,
+                //right: 900,
+                top: 175
             }
         ];
 
@@ -148,7 +188,7 @@
         }
 
 
-		function drawMissiles() {
+        function drawMissiles() {
             document.getElementById('missiles').innerHTML = ""
             for (var i = 0; i < missiles.length; i++) {
                 document.getElementById('missiles').innerHTML +=
@@ -161,9 +201,9 @@
             for (var i = 0; i < enemies.length; i++) {
                
                 if (enemies[i].top >= 650) {
-                	enemies[i].top = -80;
+                    enemies[i].top = -80;
                 } else {
-                	enemies[i].top = enemies[i].top + 5;
+                    enemies[i].top = enemies[i].top + 6;
                 }
                 
             }
@@ -192,30 +232,30 @@
 
 
         function collisionDetectionNave(){
-        	
-        	for (var enemy = 0; enemy < enemies.length; enemy++) {
-            	if (
-                       	hero.left >= (enemies[enemy].left -50) &&
+            
+            for (var enemy = 0; enemy < enemies.length; enemy++) {
+                if (
+                        hero.left >= (enemies[enemy].left -50) &&
                         hero.left <= (enemies[enemy].left + 50) &&
                         hero.top <= (enemies[enemy].top + 50) &&
                         hero.top >= (enemies[enemy].top +40)
                     ) { 
-                    	enemies.splice(enemy, 1);
+                        enemies.splice(enemy, 1);
                         a--;
- 						//alert(a);
- 						if (a > 0){
- 							$("#img"+a).remove();
+                        //alert(a);
+                        if (a > 0){
+                            $("#img"+a).remove();
                              var audio = new Audio('/../sounds/perderVida.wav');
                              audio.play();
- 						} else {
- 							perder();
- 						}
- 						
-                   	 } 
-        	
-            }	  
-            				
-			}
+                        } else {
+                            perder();
+                        }
+                        
+                     } 
+            
+            }     
+                            
+            }
 
             function win(){
                 $.ajax({

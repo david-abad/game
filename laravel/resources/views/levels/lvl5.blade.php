@@ -23,7 +23,7 @@
     -->
     <div id="ganaste" class="fin">
         <h1>¡Ganaste!</h1>
-        <p>Recibiste 10 créditos</p>
+        <p>Recibiste 30 créditos</p>
     </div>
     <div id="perdiste" class="fin">
         <h1>Has perdido</h1>
@@ -34,7 +34,6 @@
         <div id="enemies"></div>
         
         <div class="centered">
-            <img id="img3" src="/../lvl1/vida.png" class="imgz"/>
             <img id="img2" src="/../lvl1/vida.png" class="imgz"/>
             <img id="img1" src="/../lvl1/vida.png" class="imgz"/>
             <img id="img0" src="/../lvl1/vida.png" class="imgz"/>
@@ -49,10 +48,10 @@
 
         var hero = {
             left: 575,
-            top: 580
+            top: 510
         };
        
-        var a = 4;
+        var a = 3;
         var missiles = [];
 
         var enemies = [{
@@ -61,39 +60,189 @@
                 top: 100
             },
             {
-                left: 300,
+                left: 250,
                 //right: 300,
                 top: 100
             },
             {
-                left: 400,
+                left: 300,
                 //right: 400,
                 top: 100
             },
             {
-                left: 500,
+                left: 350,
                 //right: 500,
                 top: 100
             },
             {
-                left: 600,
+                left: 400,
                 //right: 600,
                 top: 100
             },
             {
-                left: 700,
+                left: 450,
                 //right: 700,
                 top: 100
             },
             {
-                left: 800,
+                left: 500,
                 //right: 800,
                 top: 100
             },
             {
-                left: 900,
+                left: 550,
                 //right: 900,
                 top: 100
+            },
+            {
+                left: 600,
+                //right: 200,
+                top: 100
+            },
+            {
+                left: 650,
+                //right: 300,
+                top: 100
+            },
+            {
+                left: 700,
+                //right: 400,
+                top: 100
+            },
+            {
+                left: 750,
+                //right: 400,
+                top: 100
+            },
+            {
+                left: 800,
+                //right: 400,
+                top: 100
+            },
+            {
+                left: 850,
+                //right: 400,
+                top: 100
+            },
+            {
+                left: 900,
+                //right: 400,
+                top: 100
+            },
+            {
+                left: 200,
+                //right: 200,
+                top: 175
+            },
+            {
+                left: 250,
+                //right: 300,
+                top: 175
+            },
+            {
+                left: 300,
+                //right: 400,
+                top: 175
+            },
+            {
+                left: 350,
+                //right: 500,
+                top: 175
+            },
+            {
+                left: 400,
+                //right: 600,
+                top: 175
+            },
+            {
+                left: 450,
+                //right: 700,
+                top: 175
+            },
+            {
+                left: 500,
+                //right: 800,
+                top: 175
+            },
+            {
+                left: 550,
+                //right: 900,
+                top: 175
+            },
+            {
+                left: 600,
+                //right: 200,
+                top: 175
+            },
+            {
+                left: 650,
+                //right: 300,
+                top: 175
+            },
+            {
+                left: 700,
+                //right: 400,
+                top: 175
+            },
+            {
+                left: 750,
+                //right: 400,
+                top: 175
+            },
+            {
+                left: 800,
+                //right: 400,
+                top: 175
+            },
+            {
+                left: 850,
+                //right: 400,
+                top: 175
+            },
+            {
+                left: 900,
+                //right: 400,
+                top: 175
+            },
+            {
+                left: 200,
+                //right: 500,
+                top: 155
+            },
+            {
+                left: 300,
+                //right: 500,
+                top: 155
+            },
+            {
+                left: 400,
+                //right: 500,
+                top: 155
+            },
+            {
+                left: 500,
+                //right: 500,
+                top: 155
+            },
+            {
+                left: 600,
+                //right: 600,
+                top: 155
+            },
+            {
+                left: 700,
+                //right: 700,
+                top: 155
+            },
+            {
+                left: 800,
+                //right: 800,
+                top: 155
+            },
+            {
+                left: 900,
+                //right: 900,
+                top: 155
             }
         ];
 
@@ -129,7 +278,7 @@
 
         function moveMissiles() {
             for (var i = 0; i < missiles.length; i++) {
-                missiles[i].top = missiles[i].top - 8
+                missiles[i].top = missiles[i].top - 12
             }
         }
 
@@ -148,7 +297,7 @@
         }
 
 
-		function drawMissiles() {
+        function drawMissiles() {
             document.getElementById('missiles').innerHTML = ""
             for (var i = 0; i < missiles.length; i++) {
                 document.getElementById('missiles').innerHTML +=
@@ -161,9 +310,9 @@
             for (var i = 0; i < enemies.length; i++) {
                
                 if (enemies[i].top >= 650) {
-                	enemies[i].top = -80;
+                    enemies[i].top = -80;
                 } else {
-                	enemies[i].top = enemies[i].top + 5;
+                    enemies[i].top = enemies[i].top + 12;
                 }
                 
             }
@@ -192,30 +341,30 @@
 
 
         function collisionDetectionNave(){
-        	
-        	for (var enemy = 0; enemy < enemies.length; enemy++) {
-            	if (
-                       	hero.left >= (enemies[enemy].left -50) &&
+            
+            for (var enemy = 0; enemy < enemies.length; enemy++) {
+                if (
+                        hero.left >= (enemies[enemy].left -50) &&
                         hero.left <= (enemies[enemy].left + 50) &&
                         hero.top <= (enemies[enemy].top + 50) &&
                         hero.top >= (enemies[enemy].top +40)
                     ) { 
-                    	enemies.splice(enemy, 1);
+                        enemies.splice(enemy, 1);
                         a--;
- 						//alert(a);
- 						if (a > 0){
- 							$("#img"+a).remove();
+                        //alert(a);
+                        if (a > 0){
+                            $("#img"+a).remove();
                              var audio = new Audio('/../sounds/perderVida.wav');
                              audio.play();
- 						} else {
- 							perder();
- 						}
- 						
-                   	 } 
-        	
-            }	  
-            				
-			}
+                        } else {
+                            perder();
+                        }
+                        
+                     } 
+            
+            }     
+                            
+            }
 
             function win(){
                 $.ajax({
