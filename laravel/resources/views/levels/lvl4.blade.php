@@ -23,7 +23,7 @@
     -->
     <div id="ganaste" class="fin">
         <h1>¡Ganaste!</h1>
-        <p>Recibiste 20 créditos</p>
+        <p>Recibiste 25 créditos</p>
     </div>
     <div id="perdiste" class="fin">
         <h1>Has perdido</h1>
@@ -302,7 +302,7 @@
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    url: "/ul/{{$user}}/1",
+                    url: "/ul/{{$user}}/4",
                     dataType: "json",
                     method: "post"
                 }).success(function(response) {

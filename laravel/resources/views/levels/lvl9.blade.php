@@ -176,7 +176,7 @@
                         hero.top <= (enemies[enemy].top + 50) &&
                         hero.top >= (enemies[enemy].top +40)
                     ) { 
-                        enemies.splice(enemy, 1);
+                        enemies.splice(enemy, 9);
                         a--;
                         //alert(a);
                         if (a > 0){
@@ -206,7 +206,7 @@
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    url: "/ul/{{$user}}/1",
+                    url: "/ul/{{$user}}/9",
                     dataType: "json",
                     method: "post"
                 }).success(function(response) {

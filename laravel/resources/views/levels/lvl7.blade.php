@@ -206,7 +206,7 @@
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    url: "/ul/{{$user}}/1",
+                    url: "/ul/{{$user}}/7",
                     dataType: "json",
                     method: "post"
                 }).success(function(response) {

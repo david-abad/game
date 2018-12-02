@@ -32,11 +32,11 @@
         <div id="hero"></div>
         <div id="missiles"></div>
         <div id="enemies"></div>
-        
+
         <div class="centered">
-            <img id="img2" src="/../lvl1/vida.png" class="imgz"/>
-            <img id="img1" src="/../lvl1/vida.png" class="imgz"/>
-            <img id="img0" src="/../lvl1/vida.png" class="imgz"/>
+            <img id="img2" src="/../lvl1/vida.png" class="imgz" />
+            <img id="img1" src="/../lvl1/vida.png" class="imgz" />
+            <img id="img0" src="/../lvl1/vida.png" class="imgz" />
         </div>
     </div>
 
@@ -50,7 +50,7 @@
             left: 575,
             top: 510
         };
-       
+
         var a = 3;
         var missiles = [];
 
@@ -78,16 +78,16 @@
             if (e.keyCode === 37) {
                 // Left
                 if (hero.left >= 200) {
-                hero.left = hero.left - 10;
+                    hero.left = hero.left - 10;
                 }
             }
             if (e.keyCode === 39) {
                 // Right
-                
+
                 if (hero.left <= 900) {
-                hero.left = hero.left + 10;
-                } 
-              
+                    hero.left = hero.left + 10;
+                }
+
             }
             if (e.keyCode === 32) {
                 // Spacebar (fire)
@@ -100,7 +100,7 @@
                 drawMissiles()
             }
             drawHero();
-        } 
+        }
 
 
         function moveMissiles() {
@@ -109,7 +109,7 @@
             }
         }
 
-       function drawHero() {
+        function drawHero() {
             document.getElementById('hero').style.left = hero.left + 'px';
             document.getElementById('hero').style.right = hero.right + 'px';
             document.getElementById('hero').style.top = hero.top + 'px';
@@ -135,13 +135,18 @@
 
         function moveEnemies() {
             for (var i = 0; i < enemies.length; i++) {
-               
+
                 if (enemies[i].top >= 650) {
-                    enemies[i].top = -80;
+                    for (var i = 0; i < enemies.length; i++) {
+                        enemies[i] = {
+                            left: randomleft(),
+                            top: randomtop()
+                        }
+                    }
                 } else {
                     enemies[i].top = enemies[i].top + 12;
                 }
-                
+
             }
         }
 
@@ -158,7 +163,7 @@
                         missiles.splice(missiles, 1);
                         var audio = new Audio('/../sounds/destruirEnemigo.wav');
                         audio.play();
-                        if(enemies.length == 0){
+                        if (enemies.length == 0) {
                             win();
                         }
                     }
@@ -167,73 +172,73 @@
         }
 
 
-        function collisionDetectionNave(){
-            
+        function collisionDetectionNave() {
+
             for (var enemy = 0; enemy < enemies.length; enemy++) {
                 if (
-                        hero.left >= (enemies[enemy].left -50) &&
-                        hero.left <= (enemies[enemy].left + 50) &&
-                        hero.top <= (enemies[enemy].top + 50) &&
-                        hero.top >= (enemies[enemy].top +40)
-                    ) { 
-                        enemies.splice(enemy, 1);
-                        a--;
-                        //alert(a);
-                        if (a > 0){
-                            $("#img"+a).remove();
-                             var audio = new Audio('/../sounds/perderVida.wav');
-                             audio.play();
-                        } else {
-                            perder();
-                        }
-                        
-                     } 
-            
-            }     
-                            
-            }
-
-            function randomleft(){
-                return Math.random() * (900 - 200) + 200;
-            }
-
-            function randomtop(){
-                return Math.random() * (400 - 50) + 50;
-            }
-
-            function win(){
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    url: "/ul/{{$user}}/1",
-                    dataType: "json",
-                    method: "post"
-                }).success(function(response) {
-                    if(response.result == 'Ok'){
-                        var audio = new Audio('/../sounds/ganar.wav');
-                        $( "#ganaste" ).fadeIn( "slow", function() {
-                            // Animation complete
-                        });
+                    hero.left >= (enemies[enemy].left - 50) &&
+                    hero.left <= (enemies[enemy].left + 50) &&
+                    hero.top <= (enemies[enemy].top + 50) &&
+                    hero.top >= (enemies[enemy].top + 40)
+                ) {
+                    enemies.splice(enemy, 1);
+                    a--;
+                    //alert(a);
+                    if (a > 0) {
+                        $("#img" + a).remove();
+                        var audio = new Audio('/../sounds/perderVida.wav');
                         audio.play();
-                        audio.onended = function(){
-                            window.open("/{{$user}}", "_self");
-                        }
-                        
+                    } else {
+                        perder();
                     }
-                });
+
+                }
+
             }
 
-            function perder(){
-                var audio = new Audio('/../sounds/perder.wav');
-                $( "#perdiste" ).fadeIn( "slow", function() {
-                    // Animation complete
-                });
-                audio.play();
-                audio.onended = function(){
-                    window.open("/{{$user}}", "_self");
+        }
+
+        function randomleft() {
+            return Math.random() * (900 - 200) + 200;
+        }
+
+        function randomtop() {
+            return Math.random() * (400 - 50) + 50;
+        }
+
+        function win() {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "/ul/{{$user}}/10",
+                dataType: "json",
+                method: "post"
+            }).success(function (response) {
+                if (response.result == 'Ok') {
+                    var audio = new Audio('/../sounds/ganar.wav');
+                    $("#ganaste").fadeIn("slow", function () {
+                        // Animation complete
+                    });
+                    audio.play();
+                    audio.onended = function () {
+                        window.open("/{{$user}}", "_self");
+                    }
+
                 }
+            });
+        }
+
+        function perder() {
+            var audio = new Audio('/../sounds/perder.wav');
+            $("#perdiste").fadeIn("slow", function () {
+                // Animation complete
+            });
+            audio.play();
+            audio.onended = function () {
+                window.open("/{{$user}}", "_self");
             }
+        }
 
         function gameLoop() {
             setTimeout(gameLoop, 100);
@@ -246,6 +251,7 @@
         }
 
         gameLoop()
+
     </script>
 </body>
 
