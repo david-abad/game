@@ -15,7 +15,32 @@ class UserController extends Controller {
         $objetos = DB::table('objetos')->orderBy("costo", "asc")->get();
         /*Buscar todos los objetos que le pertenecen al usuario*/
         $compras = DB::select('select * from objetos inner join compras on objetos.id = compras.id_objetos where id_usuarios = '.$id);
-        return view('index', ["users"=>$user, "compras"=>$compras, "objetos"=>$objetos])->with($bought=false);
+        // Determinar si el usuario obtendrá recompensa o no
+        // Si diaRecompensa = 1 o ultimoLogin = hoy - 1, entonces obtiene recompensa.
+        // Si diaRecompensa+1 = 7, hay recompensa y diaRecompensa = 1
+        // Si ultimoLogin != hoy - 1 u hoy, entonces diaRecompensa = 1
+        date_default_timezone_set('America/Mexico_City');
+        $ultimoLogin = date($user->ultimoLogin);
+        $hoy = date("Y-m-d");
+        $recompensa = false;
+        $recibida = true;
+        if($hoy != $ultimoLogin){
+            $recibida = false;
+        }
+        if(($user->diaRecompensa == 1 || $ultimoLogin == date("Y-m-d", strtotime("-1 day"))) && !$recibida){
+            $recompensa = true;
+        }
+        $dia = $user->diaRecompensa;
+        if($recompensa && !$recibida){
+            $dia = $user->diaRecompensa + 1;
+        }else{
+            $dia = 1;
+        }
+        if($dia == 8){
+            $dia = 1;
+        }
+        DB::table('usuarios')->where("id", $id)->update(['diaRecompensa'=>$dia, 'ultimoLogin'=>$hoy]);
+        return view('index', ["users"=>$user, "compras"=>$compras, "objetos"=>$objetos, "recompensa"=>$recompensa])->with([$bought=false]);
     }
     public function cambiarAvatarNave($id, $avatar, $nave){
         // Actualizamos los campos avatar y nave del usuario

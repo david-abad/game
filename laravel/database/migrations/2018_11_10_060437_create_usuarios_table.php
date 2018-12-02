@@ -22,7 +22,7 @@ class CreateUsuariosTable extends Migration
             $table->integer('nivelActual')->default(1);
             $table->string('nave')->default('nave1.png');
             $table->integer('diaRecompensa')->default(1);
-            $table->dateTime('ultimoLogin'); //No se puede dejar como nulo
+            $table->date('ultimoLogin'); //No se puede dejar como nulo
             $table->timestamps();
         });
     }

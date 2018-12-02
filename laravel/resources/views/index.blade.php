@@ -362,7 +362,7 @@
         }
         $('.modal').modal();
         var recompensas = M.Modal.getInstance($("#modalRecompensas"));
-        recompensas.open();
+        abrirRecompensa(recompensas);
         $('#guardarAvatar').click(function(){
             $.ajax({
                 headers: {
@@ -429,6 +429,17 @@
         $("#avatar1").attr("src","img_obj/"+avatar);
         $("#avatar2").attr("src","img_obj/"+avatar);
         M.toast({html: 'Tu avatar y tu nave han sido actualizados'});
+    }
+
+    function abrirRecompensa(recompensa){
+        @if($recompensa)
+        var recom = true;
+        @else
+        var recom = false;
+        @endif
+        if(recom){
+            recompensa.open();
+        }
     }
     
 </script>
