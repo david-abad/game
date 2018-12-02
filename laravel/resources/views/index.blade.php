@@ -20,7 +20,6 @@
         html, body {
             max-width: 100%;
             overflow-x: hidden;
-            
         }
         body{
             background-image: url("background.jpeg");
@@ -287,6 +286,48 @@
             <a id="btnComprar" class="modal-close green-text waves-effect waves-white btn-flat" style="font-weight: bold;">Comprar</a>
         </div>
     </div>
+    <!-- Modal comprar -->
+    <div id="modalRecompensas" class="modal grey darken-4 modal-fixed-footer" style="width: 800px;">
+        <div class="modal-content grey darken-4">
+            <h4 class="white-text">Bienvenido de nuevo</h4>
+            <p class="white-text">¡Ingresa diariamente y obtén recompensas!</p>
+            <div class="recompensas-div">
+                <div class="row center">
+                    <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
+                        <img src="coins.png" style="width: 80px;">
+                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                    </div>
+                    <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
+                        <img src="coins.png" style="width: 80px;">
+                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                    </div>
+                    <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
+                        <img src="coins.png" style="width: 80px;">
+                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                    </div>
+                    <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
+                        <img src="coins.png" style="width: 80px;">
+                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                    </div>
+                    <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
+                        <img src="coins.png" style="width: 80px;">
+                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                    </div>
+                    <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
+                        <img src="coins.png" style="width: 80px;">
+                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                    </div>
+                    <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
+                        <img src="coins.png" style="width: 80px;">
+                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer fixed grey darken-4">
+            <a id="btnComprar" class="modal-close indigo-text waves-effect waves-white btn-flat" style="font-weight: bold;">Cobrar mis recompensas</a>
+        </div>
+    </div>
     <!-- Mobile view -->
     <ul class="sidenav grey darken-4" id="mobile-demo">
         <li><a class="white-text indigo darken-3 valign-wrapper"><img id="avatar2" class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{$users->nombre }}</a></li>
@@ -320,6 +361,8 @@
             $("#reiniciar").hide();
         }
         $('.modal').modal();
+        var recompensas = M.Modal.getInstance($("#modalRecompensas"));
+        abrirRecompensa(recompensas);
         $('#guardarAvatar').click(function(){
             $.ajax({
                 headers: {
@@ -386,6 +429,17 @@
         $("#avatar1").attr("src","img_obj/"+avatar);
         $("#avatar2").attr("src","img_obj/"+avatar);
         M.toast({html: 'Tu avatar y tu nave han sido actualizados'});
+    }
+
+    function abrirRecompensa(recompensa){
+        @if($recompensa)
+        var recom = true;
+        @else
+        var recom = false;
+        @endif
+        if(recom){
+            recompensa.open();
+        }
     }
     
 </script>

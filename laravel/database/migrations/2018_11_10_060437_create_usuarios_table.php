@@ -17,10 +17,12 @@ class CreateUsuariosTable extends Migration
             $table->increments('id');
             $table->string('nombre')->unique();
             $table->string('password');
-            $table->string('avatar')->default('moon.png');
+            $table->string('avatar')->default('luna.png');
             $table->integer('creditos')->default(0);
             $table->integer('nivelActual')->default(1);
             $table->string('nave')->default('nave1.png');
+            $table->integer('diaRecompensa')->default(1);
+            $table->date('ultimoLogin'); //No se puede dejar como nulo
             $table->timestamps();
         });
     }
