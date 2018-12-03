@@ -145,7 +145,7 @@
                                 <button id="startGame" type="submit" class="waves-effect btn btn-juego white-text" style="background-image: radial-gradient(circle, #00c853, #00b54b, #00a344, #00913c, #008035); font-family: 'GoogleFont';">Comenzar juego</button>
                             </form>
                             <a id="selNivel" class="waves-effect btn btn-juego modal-trigger" style="background-image: radial-gradient(circle, #6a1b9a, #60178c, #56127e, #4c0e71, #420a64);" data-target="modalNiveles">Seleccionar nivel</a>
-                            <a class="waves-effect white btn btn-juego" style="background-image: radial-gradient(circle, #3b5998, #324e88, #2a4278, #213768, #182d59);"><img src="https://img.icons8.com/material/50/ffffff/facebook-f.png"
+                            <a id="share" class="waves-effect white btn btn-juego" style="background-image: radial-gradient(circle, #3b5998, #324e88, #2a4278, #213768, #182d59);"><img src="https://img.icons8.com/material/50/ffffff/facebook-f.png"
                                     class="material-icons left" style="width: 25px; margin-top: 5px;">Compartir</a>
                           <a class="btn-flat btn-juego" style="cursor: default;"></a>
                             <a id="reiniciar" class="waves-effect btn btn-juego modal-trigger" style="background-image: radial-gradient(circle, #e53935, #d8302b, #cc2621, #bf1c16, #b30f0b);" data-target="modalReiniciar">Reiniciar</a>
@@ -351,6 +351,11 @@
 <script type="text/javascript" src="js/materialize.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
+        $("#share").click(function(){
+            var winTop = (screen.height / 2) - (800 / 2);
+            var winLeft = (screen.width / 2) - (640 / 2);
+            window.open('http://www.facebook.com/sharer.php?s=100&p[title]=Juego TSW&p[summary]=El mejor juego en la historia de los juegos&p[url]=http://juego-tsw.local&p[images][0]=', 'sharer', 'top=' + winTop + ',left=' + winLeft + ',toolbar=0,status=0,width=640,height=800');
+        });
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -444,7 +449,7 @@
         @else
         var recom = false;
         @endif
-        if(true){
+        if(recom){
             
             // Calcular dia de recompensas
             var dia = {{$users->diaRecompensa}};
