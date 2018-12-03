@@ -17,7 +17,12 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
     <style>
+        @font-face {
+            font-family: 'GoogleFont';
+            src: url('Producto Sans Regular.ttf');
+        }
         html, body {
+            font-family: 'GoogleFont';
             max-width: 100%;
             overflow-x: hidden;
         }
@@ -137,13 +142,13 @@
                             <span class="card-title" style="font-size: 30px;">Jugar</span>
                             <form action="/start/{{$users->nivelActual}}/{{$users->id}}" enctype="multipart/form-data" method="post">
                                 {{csrf_field()}}    
-                                <button id="startGame" type="submit" class="waves-effect green accent-4 btn btn-juego">Comenzar juego</button>
+                                <button id="startGame" type="submit" class="waves-effect btn btn-juego white-text" style="background-image: radial-gradient(circle, #00c853, #00b54b, #00a344, #00913c, #008035); font-family: 'GoogleFont';">Comenzar juego</button>
                             </form>
-                            <a id="selNivel" class="waves-effect indigo accent-3 btn btn-juego modal-trigger" data-target="modalNiveles">Seleccionar nivel</a>
-                            <a class="waves-effect white btn btn-juego" style="color: #3B5998;"><img src="https://img.icons8.com/material/50/3b5998/facebook-f.png"
+                            <a id="selNivel" class="waves-effect btn btn-juego modal-trigger" style="background-image: radial-gradient(circle, #6a1b9a, #60178c, #56127e, #4c0e71, #420a64);" data-target="modalNiveles">Seleccionar nivel</a>
+                            <a class="waves-effect white btn btn-juego" style="background-image: radial-gradient(circle, #3b5998, #324e88, #2a4278, #213768, #182d59);"><img src="https://img.icons8.com/material/50/ffffff/facebook-f.png"
                                     class="material-icons left" style="width: 25px; margin-top: 5px;">Compartir</a>
                           <a class="btn-flat btn-juego" style="cursor: default;"></a>
-                            <a id="reiniciar" class="waves-effect red darken-3 btn btn-juego modal-trigger" data-target="modalReiniciar">Reiniciar</a>
+                            <a id="reiniciar" class="waves-effect btn btn-juego modal-trigger" style="background-image: radial-gradient(circle, #e53935, #d8302b, #cc2621, #bf1c16, #b30f0b);" data-target="modalReiniciar">Reiniciar</a>
                         </div>
                     </div>
                 </div>
@@ -250,10 +255,10 @@
                 @if($i <= $users->nivelActual)
                 <form action="/start/{{$i}}/{{$users->id}}" enctype="multipart/form-data" method="post">
                     {{csrf_field()}}
-                    <button id="startGame" type="submit" class="waves-effect indigo accent-3 btn" style="width: 100%; margin: 5px;">Nivel {{$i}}</button>
+                    <button id="startGame" type="submit" class="waves-effect btn" style="background-image: radial-gradient(circle, #6a1b9a, #60178c, #56127e, #4c0e71, #420a64); width: 100%; margin: 5px;">Nivel {{$i}}</button>
                 </form>
                 @else
-                <a class="waves-effect grey darken-2 btn" style="width: 100%; margin: 5px;"><i class="material-icons">lock</i></a>
+                <a class="waves-effect btn" style="background-image: radial-gradient(circle, #777878, #6b6c6c, #5f5f60, #535454, #484848); width: 100%; margin: 5px;"><i class="material-icons">lock</i></a>
                 @endif
             @endfor
         </div>
