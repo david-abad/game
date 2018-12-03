@@ -40,6 +40,21 @@ class UserController extends Controller {
             $dia = 1;
         }
         DB::table('usuarios')->where("id", $id)->update(['diaRecompensa'=>$dia, 'ultimoLogin'=>$hoy]);
+        if($recompensa){
+            $add = 0;
+            if($dia == 1){
+                $add = 100;
+            }else if($dia < 5){
+                $add = 150;
+            }else if($dia < 7){
+                $add = 200;
+            }else{
+                $add = 300;
+            }
+            DB::table('usuarios')->where("id", $id)->increment('creditos', $add);
+        }
+        //Obtener datos del usuario
+        $user = DB::table('usuarios')->where("id", $id)->first();
         return view('index', ["users"=>$user, "compras"=>$compras, "objetos"=>$objetos, "recompensa"=>$recompensa])->with([$bought=false]);
     }
     public function cambiarAvatarNave($id, $avatar, $nave){

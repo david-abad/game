@@ -291,7 +291,9 @@
             <a id="btnComprar" class="modal-close green-text waves-effect waves-white btn-flat" style="font-weight: bold;">Comprar</a>
         </div>
     </div>
-    <!-- Modal comprar -->
+    <!-- background-image: radial-gradient(circle, #777878, #6b6c6c, #5f5f60, #535454, #484848); -->
+    
+    <!-- Modal recompensas -->
     <div id="modalRecompensas" class="modal grey darken-4 modal-fixed-footer" style="width: 800px;">
         <div class="modal-content grey darken-4">
             <h4 class="white-text">Bienvenido de nuevo</h4>
@@ -300,31 +302,31 @@
                 <div class="row center">
                     <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
                         <img src="coins.png" style="width: 80px;">
-                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%; background-image: radial-gradient(circle, #ff9800, #fa8700, #f47600, #ed6400, #e65100);">$100</a>
                     </div>
                     <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
                         <img src="coins.png" style="width: 80px;">
-                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                        <a id="recom2" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%; background-image: radial-gradient(circle, #ff9800, #fa8700, #f47600, #ed6400, #e65100);">$150</a>
                     </div>
                     <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
                         <img src="coins.png" style="width: 80px;">
-                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                        <a id="recom3" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%; background-image: radial-gradient(circle, #ff9800, #fa8700, #f47600, #ed6400, #e65100);">$150</a>
                     </div>
                     <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
                         <img src="coins.png" style="width: 80px;">
-                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                        <a id="recom4" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%; background-image: radial-gradient(circle, #ff9800, #fa8700, #f47600, #ed6400, #e65100);">$150</a>
                     </div>
                     <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
                         <img src="coins.png" style="width: 80px;">
-                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                        <a id="recom5" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%; background-image: radial-gradient(circle, #ff9800, #fa8700, #f47600, #ed6400, #e65100);">$200</a>
                     </div>
                     <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
                         <img src="coins.png" style="width: 80px;">
-                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                        <a id="recom6" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%; background-image: radial-gradient(circle, #ff9800, #fa8700, #f47600, #ed6400, #e65100);">$200</a>
                     </div>
                     <div class="col s4 l3 white-text center" style:"margin-top: 10px !important;">
                         <img src="coins.png" style="width: 80px;">
-                        <a id="recom1" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%;">Día 1</a>
+                        <a id="recom7" class="modal-close btn white-text waves-effect waves-white" style="font-weight: bold; height: 100%; width: 100%; background-image: radial-gradient(circle, #ff9800, #fa8700, #f47600, #ed6400, #e65100);">$300</a>
                     </div>
                 </div>
             </div>
@@ -442,7 +444,22 @@
         @else
         var recom = false;
         @endif
-        if(recom){
+        if(true){
+            
+            // Calcular dia de recompensas
+            var dia = {{$users->diaRecompensa}};
+            dia++;
+            if(dia==8){
+                dia = 1;
+            }
+            for(var i = dia; i<8; i++){
+                var recom = $("#recom" + i);
+                recom.html("");
+                recom.append($("<i class='material-icons'>lock</i>"));
+                recom.css('background-image', 'radial-gradient(circle, #777878, #6b6c6c, #5f5f60, #535454, #484848)');
+                recom.css('height', '36px');
+                recom.css('width', '100%');
+            }
             recompensa.open();
         }
     }
