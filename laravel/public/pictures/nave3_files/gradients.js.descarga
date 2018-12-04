@@ -1,0 +1,266 @@
+function getProcessedGrads() {
+	var gradsIds = getGradsIds();
+	var processed = [];
+	var actualGradColors = [];
+	for (var i = gradsIds.length - 1; i >= 0; i--) {
+		var actualGradId = gradsIds[i];
+		if (isGradColorsProcessed(actualGradId, processed)) {
+			processed = addIdToColorGradAndRet(actualGradId, getColors(actualGradId), processed);
+		} else {
+			processed = addNewGradColors(actualGradId, getColors(actualGradId), processed);
+		}
+	}
+	processed = processed.sort(function (a, b) {
+		return a.ids.length - b.ids.length;
+	});
+	setActualColors(processed);
+	return processed;
+}
+
+function setActualColors(processed) {
+	var actualGradColors = [];
+	for (var i = 0; i < processed.length; i++) {
+		var actualId = "";
+		for (var j = 0; j < processed[i].ids.length; j++) {
+			actualId += processed[i].ids[j];
+		}
+		var actualColors = [];
+		for (var j = 0; j < processed[i].colors.length; j++) {
+			actualColors.unshift(processed[i].colors[j]);
+		}
+		actualGradColors.push({
+			id: actualId,
+			colors: actualColors
+		});
+	}
+	document.actualGradColors = actualGradColors;
+}
+
+function addNewGradColors(id, colors, processed) {
+	processed.push({
+		ids: [id],
+		colors: colors
+	});
+	return processed;
+}
+
+function addIdToColorGradAndRet(id, colors, processed) {
+	for (var i = processed.length - 1; i >= 0; i--) {
+		var actualGradColors = processed[i].colors;
+		if (gradHasColors(id, actualGradColors)) {
+			processed[i].ids.push(id);
+			return processed;
+		}
+	}
+	return processed;
+}
+
+function isGradColorsProcessed(gradId, processed) {
+	for (var i = processed.length - 1; i >= 0; i--) {
+		var actualGradColors = processed[i].colors;
+		if (gradHasColors(gradId, actualGradColors)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function gradHasColors(gradId, colors) {
+	var gradColors = getColors(gradId);
+	if (gradColors.length != colors.length) {
+		return false;
+	}
+	for (var i = gradColors.length - 1; i >= 0; i--) {
+		if (gradColors[i] != colors[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
+function getColors(gradId) {
+	var colors = [];
+	var stops = $("#" + gradId + " stop");
+	for (var i = stops.length - 1; i >= 0; i--) {
+		var actualStopColor = getComputedStyle(stops[i], null).getPropertyValue('stop-color');
+		colors.push(rgb2hex(actualStopColor));
+	}
+	return colors;
+}
+
+function getGradsIds() {
+	var gradients = $("linearGradient, radialGradient");
+	var ids = [];
+	for (var i = gradients.length - 1; i >= 0; i--) {
+		ids.push(gradients[i].id);
+	}
+	return ids;
+}
+
+function getRenderedProcessedGrads(processed) {
+	var html = "";
+	if (processed.length > 0) {
+		html += '<span class="gradientGroupTitle">Gradients</span>';
+		html += '<br>';
+	}
+	for (var i = processed.length - 1; i >= 0; i--) {
+		var actual = processed[i];
+		var idGroup = getJoinedIds(actual.ids);
+		var style = 'style="background: linear-gradient(to right, ';
+		html += '<div id="' + idGroup + '" class="gradientGroup" ###>';
+		for (var j = actual.colors.length - 1; j >= 0; j--) {
+			style += actual.colors[j] + ", ";
+			var color = actual.colors[j];
+			var index = [actual.colors.length - j - 1];
+			var gradsIds = actual.ids;
+			var gradsInfo = JSON.stringify(index.concat(gradsIds));
+      html += '<input id="' + idGroup + index + '" data-groupid="' + idGroup + '" data-gradsinfo=' + gradsInfo + ' class="colorpicker-grad" value="' + color.replace("#", "") + '" onchange="changeGrad(this)">';
+		}
+		style = style.slice(0, -2) + ');"';
+		html = html.replace("###", style);
+    html += "</div><br>";
+	}
+	return html;
+}
+
+function moveChangeGrad(color) {
+	setColorGrad(document.getElementById(document.actualPicker), false, color.toHexString().replace("#", ""));
+}
+
+function getJoinedIds(ids) {
+	var result = "vex";
+	for (var i = 0; i < ids.length; i++) {
+		result += ids[i];
+	}
+	return result;
+}
+
+function changeGrad(obj) {
+	var idElement = obj.id.replace("vex", "");
+	var ids = JSON.parse(obj.dataset.gradsinfo);
+	var colorIndex = ids[0];
+	var actualColor = getActualColor(obj.dataset.groupid, colorIndex);
+	var color = obj.value.replace("#", "");
+	updateActualColor(obj.dataset.groupid, colorIndex, color);
+	logGradientChangeColor(idElement, colorIndex, actualColor, color);
+	setColorGrad(obj);
+}
+
+function setColorGrad(obj, log = false, color = null) {
+	if (!color) {
+		color = obj.value + "";
+	}
+	var idElement = obj.id.replace("vex", "");
+	var parent = obj.parentElement;
+	var ids = JSON.parse(obj.dataset.gradsinfo);
+	var colorIndex = ids[0];
+	ids.shift();
+	for (var i = ids.length - 1; i >= 0; i--) {
+		var stop = $("#" + ids[i] + " stop")[colorIndex];
+		setColorToStop(stop, color);
+		setColorToGradientBox(color, colorIndex, parent);
+	}
+	if (log) {
+		updateActualColor(obj.dataset.groupid, colorIndex, color);
+	}
+}
+
+function setColorToStop(obj, color) {
+	obj.style.setProperty("stop-color", hex2rgb(color));
+}
+
+function setColorToGradientBox(color, index, gradientBox) {
+	var actualGrad = gradientBox.style.background.replace(" repeat scroll 0% 0%", "").replace("rgba(0, 0, 0, 0)", "");
+	var newGrad = "linear-gradient(to right, ";
+	var colors = joinBy(actualGrad.replace(newGrad, "").slice(0, -1).split(","), 3, ",");
+	color = hex2rgb(color);
+	colors[index] = color;
+	newGrad += joinArray(colors, ",") + ")";
+	gradientBox.style.background = newGrad;
+}
+
+function getActualColor(id, index) {
+	for (var i = 0; i < document.actualGradColors.length; i++) {
+		if (document.actualGradColors[i].id == id.replace("vex", "")) {
+			return document.actualGradColors[i].colors[index].replace("#", "");
+		}
+	}
+	return null;
+}
+
+function updateActualColor(id, index, color) {
+	for (var i = 0; i < document.actualGradColors.length; i++) {
+		if (document.actualGradColors[i].id == id.replace("vex", "")) {
+			document.actualGradColors[i].colors[index] = color;
+		}
+	}
+}
+
+function joinBy(array, step, between = "") {
+	for (var i = 0; i < array.length; i++) {
+		if (array[i].includes("rgba")) {
+			array[i] = array[i].replace("rgba", "rgb");
+			array[i + 3] = array[i + 3].replace(" 0)", "")
+			array[i + 2] = array[i + 2] + ")";
+		}
+	}
+	var result = [];
+	for (var i = 0; i < array.length; i = i + step) {
+		var actualJoin = "";
+		for (var j = 0; j < step; j++) {
+			actualJoin += array[i + j] + between;
+		}
+		actualJoin = actualJoin.slice(0, (between.length) * -1);
+		result.push(actualJoin);
+	}
+	return result;
+}
+
+function joinArray(array, separator = "") {
+	var result = "";
+	for (var i = 0; i < array.length; i++) {
+		result += array[i] + separator;
+	}
+	result = result.slice(0, (separator.length) * -1);
+	return result;
+}
+
+function displayGradients(id) {
+	var processedGrads = getProcessedGrads();
+	document.processedGrads = processedGrads;
+	var html = getRenderedProcessedGrads(processedGrads);
+	$("#" + id).html(html);
+	$(".colorpicker-grad").spectrum({
+		preferredFormat: "hex",
+		showInput: true,
+		showPalette: true,
+    move: moveChangeGrad,
+    appendTo: '#gradients',
+    containerClassName: 'vx-color-picker',
+    showButtons: false
+  });
+  $(".colorpicker-grad").on('show.spectrum', showGradPicker);
+}
+
+function showGradPicker(e, color) {
+  document.openedPicker = e.currentTarget.id;
+  document.isPickerOpen = true;
+}
+
+function rgb2hex(rgb) {
+	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+	return (rgb && rgb.length === 4) ? "#" +
+		("0" + parseInt(rgb[1], 10).toString(16)).slice(-2) +
+		("0" + parseInt(rgb[2], 10).toString(16)).slice(-2) +
+		("0" + parseInt(rgb[3], 10).toString(16)).slice(-2) : '';
+}
+
+function hex2rgb(hex) {
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	var aux = result ? {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16)
+	} : null;
+	return "rgb(" + aux.r + ", " + aux.g + ", " + aux.b + ")";
+}

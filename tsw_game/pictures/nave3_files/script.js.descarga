@@ -1,0 +1,306 @@
+resetEditedPngSvg();
+function initEditColorModal() {
+
+  document.isPickerOpen = false;
+  document.openedPicker = null;
+
+	$("path, polygon, circle, rect, ellipse, line, polyline, text").on('click touchstart', function (e) {
+		var target = e.target;
+		var actualColor = getComputedStyle(target, null).getPropertyValue('fill');
+		if (isColor(actualColor)) {
+			$("#" + getIdPickerByColor(actualColor)).next().trigger('click');
+			return false;
+		} else {
+			var id = actualColor.replace('url("', '').replace('")', "");
+			var groups = $(".gradientGroup");
+			for (var i = 0; i < groups.length; i++) {
+				var idG = groups[i].id.replace("vex", "");
+				if (id.includes(idG)) {
+					var firstBtn = groups[i].firstChild;
+					$("#" + firstBtn.id).next().click();
+					return false;
+				}
+			}
+		}
+	});
+
+	$("#sizeSelector").change(function (e) {
+		var value = e.target.value;
+		if (value == "Custom") {
+			$("#containerCustomSize").show();
+		} else {
+			$("#containerCustomSize").hide();
+		}
+	});
+
+	$('#downloadBtn').click(function (event) {
+		clickOnDownloadEdited();
+	});
+
+	$("#svgSize").keyup(function () {
+		reloadSizeText();
+	});
+
+  $('.select-options label').click(
+    function(event) {
+      $(event.target).parent().siblings('.custom-select').val($(event.target).attr('data-url'));
+      $('.custom-select').attr('data-url', $(event.target).attr('data-url'));
+      toggleOptions(event.target);
+      $(event.target).closest('.custom-select-container').removeClass('filter-visible');
+    }
+  );
+
+  $('input[readonly]').focus(function(){
+      this.blur();
+  });
+
+  $('body').on('click',
+        function(event) {
+            var filterOptions = $('.custom-select');
+            if (!filterOptions.is(event.target) && filterOptions.has(event.target).length === 0 &&
+                $('.custom-select-container').hasClass('select-visible')) {
+                $('.custom-select-container').removeClass('select-visible');
+            }
+
+            var pickerElem =  $('.sp-container').not('.sp-hidden');
+            if (!pickerElem.is(event.target)) {
+              $('.color-gradient-container').css({overflow: 'scroll'});
+            } 
+        }
+    );
+
+  $('.custom-select-container').on('click',
+      function(event) {
+          $(this).toggleClass('select-visible');
+          return false;
+      }
+  );
+
+  $('.sp-replacer').on('click touchstart', function(event) {
+    handlePickerClick(event);
+  });
+}
+
+function clickOnDownloadEdited(){
+
+    consoleLog("clickOnDownloadEdited");
+
+    if(globalUserStatusLoaded){
+		if(globalUserHasLicence){
+			processEditedDownload();	
+		} else{
+			var svg = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1200 1200" enable-background="new 0 0 1200 1200" xml:space="preserve">' + $(".canvas-container #" + document.svgId).html() + '</svg>';
+			$(".image-precio").hide().parent().html(svg);
+			$("#download-btn").modal("open");
+			saveEditedPngSvg();
+		}
+    } else{
+        consoleLog("waiting for clickOnDownloadEdited");
+        setTimeout(clickOnDownloadEdited, loopInterval);
+    }
+}
+
+function resetEditedPngSvg(){
+
+    $.ajax({
+        url:    '/ajax/vexels-api/reset-edited-color-png-svg/',
+        type:     'post',
+        data:     {},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));      
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function saveEditedPngSvg(){
+
+	common_debug_console = true;
+	var size = $("#sizeSelector").val();
+	if (size == "Custom") {
+		size = $("#svgSize").val();
+	} else {
+		size = size.replace("px", "");
+	}
+	var format = $("#formatSelector").val();
+	var editedSvg = $(".canvas-container #" + document.svgId).html();
+	
+    $.ajax({
+        url:    '/ajax/vexels-api/save-edited-color-png-svg/',
+        type:     'post',
+        data:     {idVector: globalIdCurentVector, editedSvg: editedSvg, format: format, size: size},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data)); 
+			common_debug_console = false;           
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function processEditedDownload(){
+	var size = $("#sizeSelector").val();
+	if (size == "Custom") {
+		size = $("#svgSize").val();
+	} else {
+		size = size.replace("px", "");
+	}
+	var format = $("#formatSelector").val();
+	if (format == "SVG") {
+		var newSvg = $(".canvas-container #" + document.svgId).clone();
+		newSvg.attr("id", "downloadSvg");
+		newSvg.appendTo("body");
+		resizeSvg("downloadSvg", size);
+		downloadSvgAsSvg("downloadSvg");
+	} else if (format == "PNG") {
+		var newSvg = $(".canvas-container #" + document.svgId).clone();
+		newSvg.attr("id", "downloadSvg");
+		newSvg.appendTo("body");
+		resizeSvg("downloadSvg", size);
+		downloadSvgAsPng("downloadSvg");
+	}
+}
+
+function handlePickerClick(e) {
+  var pickerElem =  $('.sp-container').not('.sp-hidden');
+  pickerElem.css({'visibility': 'hidden'});
+  setTimeout(function () {
+    $('.color-gradient-container').css({overflow: 'visible'});
+    var pickerElem =  $('.sp-container').not('.sp-hidden');
+    pickerElem.css({'visibility': 'hidden'});
+    var elem = $(e.target).closest('.sp-preview').length ? $(e.target).closest('.sp-preview') : $(e.target).find('.sp-preview');
+    pickerElem.css({top: 0});
+
+    var windowWidth = $('body').width();
+    var offsetTop = 0;
+    if (windowWidth < 768) {
+      offsetTop = $('.color-editor').height() - $('.controls-box').height() + $('.controls-box').height() / 2;
+      var offsetLeft = $('body').width() / 2;
+      pickerElem.css({top: offsetTop, left: offsetLeft, 'transform': 'translate(-50%, -50%)'});
+    } else {
+      pickerElem.css({top: elem.offset().top - pickerElem.offset().top + 33});
+    }
+    pickerElem.css({'visibility': 'visible'});
+  }, 100);
+}
+
+function toggleOptions(element) {
+  $(element).siblings(':hidden').toggle();
+  $(element).toggle();
+}
+
+function getIdPickerByColor(color) {
+	color = rgb2hex(color).replace("#", "").toLowerCase();
+	var colors = document.actualColors;
+	for (var key in colors) {
+		var value = colors[key];
+		if (value.toLowerCase() == color) {
+			return key;
+		}
+	}
+}
+
+function resizeSvg(id, value) {
+	$("#" + id).attr("height", value);
+	$("#" + id).attr("width", value);
+}
+
+function reloadSizeText() {
+	var value = $("#svgSize").val();
+	$("#sizeText").html(" x " + value + "px");
+}
+
+function triggerDownload(imgURI, id) {
+	var evt = new MouseEvent('click', {
+		view: window,
+		bubbles: false,
+		cancelable: true
+	});
+  var a = document.createElement('a');
+  var splitUrl = window.location.href.split('/');
+	a.setAttribute('download', splitUrl[splitUrl.length - 1] + '-by_vexels.png');
+	a.setAttribute('href', imgURI);
+	a.setAttribute('target', '_blank');
+	a.dispatchEvent(evt);
+	$("#canvas").hide();
+  $("#" + id).remove();
+  javascript:ga('send', 'event', 'color_editor', 'download', window.location.href);
+}
+
+function downloadSvgAsPng(id) {
+  var svg = $("#" + id)[0];
+	var height = svg.getBoundingClientRect().height;
+	var width = svg.getBoundingClientRect().width;
+	var canvas = $("#canvas")[0];
+	canvas.width = width;
+	canvas.height = height;
+	var ctx = canvas.getContext("2d");
+	var data = (new XMLSerializer()).serializeToString(svg);
+	var DOMURL = window.URL || window.webkitURL || window;
+	var img = new Image();
+	var svgBlob = new Blob([data], {
+		type: 'image/svg+xml;charset=utf-8'
+	});
+	var url = DOMURL.createObjectURL(svgBlob);
+	img.onload = function () {
+		ctx.drawImage(img, 0, 0);
+		DOMURL.revokeObjectURL(url);
+		var imgURI = canvas
+			.toDataURL('image/png')
+			.replace('image/png', 'image/octet-stream');
+		triggerDownload(imgURI, id);
+	};
+	img.src = url;
+}
+
+function downloadSvgAsSvg(id) {
+	var svg = $("#" + id)[0];
+	var serializer = new XMLSerializer();
+	var source = serializer.serializeToString(svg);
+	if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+		source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+	}
+	if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+		source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+	}
+	source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+	var url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+
+	var evt = new MouseEvent('click', {
+		view: window,
+		bubbles: false,
+		cancelable: true
+	});
+  var a = document.createElement('a');
+  var splitUrl = window.location.href.split('/');
+	a.setAttribute('download', splitUrl[splitUrl.length - 1] + '-by_vexels.svg');
+	a.setAttribute('href', url);
+	a.setAttribute('target', '_blank');
+	a.dispatchEvent(evt);
+	$("#" + id).remove();
+}

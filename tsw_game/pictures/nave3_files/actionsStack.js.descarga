@@ -1,0 +1,74 @@
+var undoStack = [];
+var redoStack = [];
+
+function execute(command) {
+    if (command.includes("changeColor")) {
+        var data = command.split("-");
+        var id = data[1];
+        $("#" + id).spectrum("set", data[3]);
+        setColorPolygon(document.getElementById(id), true);
+    } else if (command.includes("changeGradient")) {
+        var data = command.split("-");
+        var id = data[1];
+        $("#" + id).spectrum("set", data[4]);
+        setColorGrad(document.getElementById(id), true);
+    }
+}
+
+function logChangeColor(element, from, to) {
+    var element = {
+        self: "changeColor-" + element + "-" + from + "-" + to,
+        inverse: "changeColor-" + element + "-" + to + "-" + from
+    };
+    log(element);
+}
+
+function logGradientChangeColor(element, index, from, to) {
+    var element = {
+        self: "changeGradient-" + element + "-" + index + "-" + from + "-" + to,
+        inverse: "changeGradient-" + element + "-" + index + "-" + to + "-" + from
+    };
+    log(element);
+}
+
+$('document').ready(function () {
+    $("#undoBtn").click(function () {
+        undo();
+    });
+
+    $("#redoBtn").click(function () {
+        redo();
+    });
+
+    $("#resetBtn").click(function () {
+        reset();
+    });
+});
+
+function reset() {
+    while (undoStack.length > 0) {
+        undo();
+    }
+    redoStack = [];
+}
+
+function undo() {
+    if (undoStack.length > 0) {
+        var last = undoStack.pop();
+        redoStack.push(last);
+        execute(last.inverse);
+    }
+}
+
+function redo() {
+    if (redoStack.length > 0) {
+        var last = redoStack.pop();
+        undoStack.push(last);
+        execute(last.self);
+    }
+}
+
+function log(action) {
+    undoStack.push(action);
+    redoStack = [];
+}

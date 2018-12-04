@@ -1,0 +1,160 @@
+function getProcessedColors() {
+	var n = 1;
+	var elements = $("path, polygon, circle, rect, ellipse, line, polyline, text");
+	var processed = [];
+	var actualColors = [];
+	for (var i = elements.length - 1; i >= 0; i--) {
+		var actualElement = elements[i];
+		var actualColor = getComputedStyle(actualElement, null).getPropertyValue('fill');
+		if (isColor(actualColor)) {
+			if (isColorInArray(processed, actualColor)) {
+				processed = getPlusOneInArrayColor(processed, actualElement);
+			} else {
+				processed.push({
+					value: actualColor,
+					elements: [actualElement],
+					id: "jsColor" + n
+				});
+				actualColors["jsColor" + n] = rgb2hex(actualColor).replace("#", "");
+				n++;
+			}
+		}
+	}
+	processed = processed.sort(function (a, b) {
+		return a.elements.length - b.elements.length;
+	});
+	document.colors = processed;
+	document.actualColors = actualColors;
+	return processed;
+}
+
+function isColor(element) {
+	var result = !element.includes("url") &&
+		!element.includes("none");
+	return result;
+
+}
+
+function isColorInArray(array, color) {
+	for (var i = array.length - 1; i >= 0; i--) {
+		var actualColor = array[i];
+		if (actualColor.value == color) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function getPlusOneInArrayColor(array, element) {
+	var color = getComputedStyle(element, null).getPropertyValue('fill');
+	for (var i = array.length - 1; i >= 0; i--) {
+		var actualColor = array[i];
+		if (actualColor.value == color) {
+			array[i].amount++;
+			array[i].elements.push(element);
+			break;
+		}
+	}
+	return array;
+}
+
+function getRenderedProcessedColors(processed) {
+	var html = "";
+	if (processed.length > 0) {
+		html += '<span class="colorGroupTitle">Colors</span>';
+		html += '<br>';
+	}
+
+	html += '<div class="colorGroup">';
+	for (var i = processed.length - 1; i >= 0; i--) {
+		var actual = processed[i];
+		var color = rgb2hex(actual.value);
+		var id = actual.id;
+		html += '<input id="' + id + '" data-colorsinfo=' + id + ' class="colorpicker-color" value="' + color.replace("#", "").trim() + '" onclick="cickPicker(this)">';
+	}
+	html += "</div>";
+	return html;
+}
+
+function moveChangeColor(color) {
+	setColorPolygon(document.getElementById(document.actualPicker), false, color.toHexString().replace("#", ""));
+}
+
+function changeColorEvent(color) {
+	changeColor(document.getElementById(document.actualPicker),
+  color.toHexString().replace("#", ""));
+  document.isPickerOpen = false;
+}
+
+function showColorPicker(e, color) {
+  if (document.isPickerOpen && document.openedPicker.includes("jsColor")) {
+    changeColor(document.getElementById(document.openedPicker), $("#" +
+    document.openedPicker).spectrum("get").toHexString().replace("#", ""))
+  }
+  document.openedPicker = e.currentTarget.id;
+  document.isPickerOpen = true;
+}
+
+function changeColor(obj, color = null) {
+	var id = obj.dataset.colorsinfo;
+	if (!color) {
+		color = obj.value.replace("#", "");
+	}
+	var from = document.actualColors[id].replace("#", "");
+	document.actualColors[id] = color;
+	logChangeColor(id, from, color);
+	setColorPolygon(obj, false, color);
+}
+
+function setColorPolygon(obj, log = false, color = null) {
+	if (!color) {
+		color = obj.value.replace("#", "");
+	}
+	var id = obj.dataset.colorsinfo;
+	var colors = document.colors;
+	for (var i = colors.length - 1; i >= 0; i--) {
+		if (colors[i].id == id) {
+			var elements = colors[i].elements;
+			for (var i = elements.length - 1; i >= 0; i--) {
+				setColorToPolygon(elements[i], color);
+			}
+		}
+	}
+	if (log) {
+		document.actualColors[id] = color;
+	}
+}
+
+function setColorToPolygon(obj, color) {
+	obj.style.fill = "#" + color;
+}
+
+function displayColors(id) {
+	var processedColors = getProcessedColors();
+  var html = getRenderedProcessedColors(processedColors);
+  $("#" + id).html(html);
+	$(".colorpicker-color").spectrum({
+		preferredFormat: "hex",
+		showInput: true,
+		showPalette: true,
+		move: moveChangeColor,
+    change: changeColorEvent,
+    containerClassName: 'vx-color-picker',
+    showButtons: false,
+    appendTo: '#colors'
+  });
+  $(".colorpicker-color").on('show.spectrum', showColorPicker);
+	$(".sp-replacer").on('click touchstart', function () {
+		document.actualPicker = this.previousSibling.id;
+	});
+}
+
+
+
+function rgb2hex(rgb) {
+	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+	return (rgb && rgb.length === 4) ? "#" +
+		("0" + parseInt(rgb[1], 10).toString(16)).slice(-2) +
+		("0" + parseInt(rgb[2], 10).toString(16)).slice(-2) +
+		("0" + parseInt(rgb[3], 10).toString(16)).slice(-2) : '';
+}

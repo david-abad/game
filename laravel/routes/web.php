@@ -19,6 +19,14 @@ Route::get('start/{level}/{user_id}', function(){
     return abort(401);
 });
 
+Route::get("/", function(){
+    return view("index");
+});
+
+Route::get("/reg/reg", function(){
+    return view("registro");
+});
+
 Route::get('uan/{id}/{avatar}/{nave}', 'UserController@cambiarAvatarNave');
 Route::post('ul/{id}/{nivel}', 'UserController@subirDeNivel');
 Route::get('re/{id}', 'UserController@reiniciar');

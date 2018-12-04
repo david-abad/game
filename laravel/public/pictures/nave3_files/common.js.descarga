@@ -1,0 +1,1690 @@
+/* GLOBAL SETTINGS */
+
+$.ajaxSetup ({
+    // Disable caching of AJAX responses
+    cache: false,
+    headers: { "cache-control": "no-cache" }
+});
+
+/* GLOBAL VARIABLES */
+
+var afterLoginModal="";
+var maxTabHeight = 0;
+var loggedUserId = "";
+var common_debug_console = false;
+var showBecomeProBanner = true;
+var userHasCredit = false;
+var user_has_licence = false;
+var isSubscriptor = false;
+var isSvgPng = false;
+var currentViewing = "";
+var displayVectors = [];
+var paymentFailureCookieName = "paymentFailureShowNoMore_";
+var purchase_modal_title_orig = "";
+var payment_method_title_orig = "";
+var loopInterval = 500;
+var forcePayPalPurchase = false;
+var globalUserTmp = {};
+
+/* GLOBAL VARIABLES FOR USER LOGIN/SUBSCRIPTION STATUS */
+var globalUserStatusLoaded = false;
+var globalUserIsSubscriptor = false;
+var globalUserIsLogged = false;
+var globalUserHasLicence = false;
+var globalUserHasCredit = false;
+var globalUserPaymentFailure = false;
+var globalUserLoggedId = "";
+var globalIdCurentVector = "";
+var globalIsCurrentVectorPremium = false;
+var globalUserPlanName = "";
+var globalUserPlanId = "";
+var globalUserPlanType = "";
+var globalUserAvatar = "";
+var globalUserTitle = "";
+var globalUserName = "";
+var globalUserAfterLogInJs = "";
+var globalUserAfterLogInJsArgs = "";
+var globalMessage = "";
+var globalMessageTitle = "";
+var globalIStockLink = "";
+var globalRandomIStockIndex = "";
+var globalPromptPopUp = false;
+var globalPromptPopUpTitle = "";
+var globalPromptPopUpText = "";
+var globalUserNameFull = "";
+
+/********************************************************/
+
+globalUserStatusCheck();
+consoleLog("globalUserStatusLoaded: " + globalUserStatusLoaded);
+
+/********************************************************/
+/* ON DOM-READY EVENT ACTIONS */
+/********************************************************/
+
+$(function(){
+    $.toggleShowPassword = function (options) {
+        var settings = $.extend({
+            field: "#password",
+            control: "#toggle_show_password",
+        }, options);
+
+        var control = $(settings.control);
+        var field = $(settings.field)
+
+        control.bind('click', function () {
+            if (control.is(':checked')) {
+                field.attr('type', 'text');
+            } else {
+                field.attr('type', 'password');
+            }
+        })
+    };
+
+    setContactUs();
+    checkSubscriptionStatus();
+    getUserSubscriptionStatus("runIfSubscriptor", "runIfNOTSubscriptor");
+    getAfterLoginJS();
+
+    $(".tab").on("click", function(){
+        $(".tab-content").each(function(i, obj){
+            if($(obj).height() > maxTabHeight) maxTabHeight = $(obj).height();
+        });
+
+        $(".tab-content").hide();
+        $(".tab").addClass('desactivado');
+        $(this).removeClass('desactivado');
+        var rel = $(this).attr('rel');
+        $(".tab-content-" + rel).height(maxTabHeight);
+        $(".tab-content-" + rel).show();
+    });
+
+    populateUserData();
+    dispatchGlobalMessage();
+    dispatchPromptNotification();
+
+    loadRandomIstockLink("blk__promocode-code");
+
+    $('.v-nav__elm--hamburger-menu').hover(
+        function() {
+            $('.v-nav__discover-dd').toggleClass('visible');
+            $('.v-nav__elm--discover').toggleClass('discover-visible');
+        }
+    );
+	
+	/* TOUCH AWAY MOBILE HEADER*/	
+    $('.v-nav__elm--hamburger-menu').click(
+      function(){
+        $('.menu-header-overlay').addClass('visible');
+      }
+    );
+
+    $('.menu-header-overlay').click(
+      function(event) {
+        $('.menu-header-overlay').removeClass('visible');
+      }
+    );	
+	/*END TOUCH AWAY*/
+
+    $('.v-nav__discover-dd').hover(
+        function() {
+            $('.v-nav__elm--discover').toggleClass('discover-visible');
+        }
+    );
+
+    $('.filter-options label').click(
+        function(event) {
+            $('.filter-select').val($(event.target).text());
+            $('.filter-select').attr('data-url', $(event.target).attr('data-url'));
+            toggleOptions(event.target);
+            $('.filter-options').slideUp(200, 'linear');
+            $('.filter-search-container').removeClass('filter-visible');  
+        }
+    );
+
+    $('input[readonly]').focus(function(){
+        this.blur();
+    });
+
+    $('body').on('click',
+        function(event) {
+            consoleLog(event.isImmediatePropagationStopped());
+            var filterOptions = $('.filter-select');
+            if (!filterOptions.is(event.target) && filterOptions.has(event.target).length === 0 && 
+                $('.filter-search-container').hasClass('filter-visible')) {
+                $('.filter-options').slideUp(200, 'linear');
+                $('.filter-search-container').removeClass('filter-visible');  
+            }
+
+            if ($('.popup-overlay.modal').is(event.target)){
+              $('.popup-overlay').hide();
+              $(this).css({overflow: 'auto'});
+            }
+        }
+    );
+
+    $('.filter-select').on('click',
+        function(event) {
+            event.stopImmediatePropagation();
+            if ($('.filter-search-container').hasClass('filter-visible')) {
+                $('.filter-options').slideUp(200, 'linear');  
+            } else {
+                $('.filter-options').slideDown(200, 'linear');
+            }
+            $('.filter-search-container').toggleClass('filter-visible');
+            return false;            
+        }
+    );
+
+    $('.btnShareFB').click(function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        elem = $(this);
+        var obj = {method: 'feed',link: elem.prop('href'), picture: elem.data('image'), name: elem.data('title'), description: elem.data('desc')};
+        function callback(response){}
+        FB.ui(obj, callback);
+        return false;
+    });
+
+    $('.btnSharePinterest').click(function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        var el = $(this);
+        var url = "https://www.pinterest.com/pin/create/button/?guid=Twx868wJKVP8-1&url=" + el.data("pin-url") + "&media=" + el.data("pin-media").replace("images.vexels.com", "www.vexels.com") + "&description=" + el.data("pin-description");
+
+        var win = window.open(url, '_blank');
+        if(win){
+            win.focus();
+        } else {
+            displayGlobalMessage("Please allow popups for this website", "");
+        }
+        return false;
+    });
+
+    $('.btnShareGoogleTwitter').click(function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        var win = window.open($(this).data("url"), '_blank');
+        if(win){
+            win.focus();
+        } else {
+            displayGlobalMessage("Please allow popups for this website", "");
+        }
+        return false;
+    });
+
+    //This is for hidding the favorites and share options on listing
+    //$(".hover-btn.hover-btn__fav").hide();
+    //$(".btn-container.btn-container__share").hide();
+
+    $( ".featured-list__item" ).each(function( index ) {
+        consoleLog( "idVector: " + $( this ).data("vectorid") );
+        displayVectors.push($( this ).data("vectorid"));
+    });
+
+    $( ".fav_container" ).each(function( index ) {
+        consoleLog( "idVector: " + $( this ).data("vectorid") );
+        displayVectors.push($( this ).data("vectorid"));
+    });
+
+    if(displayVectors.length > 0){
+        //uncomment below line in case favorites feature needs to be re enabled
+        validateUserLogIn("checkLikeVectors", "'" + displayVectors.join("__") + "'", "actionOnNOTLoggedIn", "");
+    }
+});
+
+/********************************************************/
+
+
+function globalUserStatusCheck(){
+
+    consoleLog("Global User Status Check");
+
+    globalIdCurentVector = getVectorIdFromURL();
+
+    $.ajax({
+        url:    '/ajax/vexels-api/get-global-user-status/',
+        type:     'post',
+        async: true,
+        data:     { idVector: globalIdCurentVector },
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+
+            if(data.error == "" || data.error == null){
+                globalUserIsSubscriptor         = data.isSubscriptor;
+                globalUserIsLogged              = data.isLogged;
+                globalUserHasLicence            = data.hasLicence;
+                globalUserHasCredit             = data.hasCredit;
+                globalUserPaymentFailure        = data.paymentFailure;
+                globalUserLoggedId              = data.idUser;
+                globalIdCurentVector            = data.idVector;
+                globalIsCurrentVectorPremium    = data.isVectorPremium;
+                globalUserPlanId                = data.idPlan;
+                globalUserPlanName              = data.planName;
+                globalUserPlanType              = data.userPlanType;
+                globalUserAfterLogInJs          = data.afterLoginJs;
+                globalUserAfterLoginJsArgs      = data.afterLoginJsArgs;
+                globalUserAvatar                = data.userAvatar;
+                globalUserTitle                 = data.userTitle;
+                globalUserName                  = data.userName;
+                globalUserNameFull              = data.userNameFull;
+                globalMessage                   = data.globalMessage;
+                globalMessageTitle              = data.globalMessageTitle;
+                globalIStockLink                = data.iStockLink;
+                globalRandomIStockIndex         = data.randomIStockIndex;
+                globalPromptPopUp               = data.pormptPopUp;
+                globalPromptPopUpTitle          = data.pormptPopUpTitle;
+                globalPromptPopUpText           = data.pormptPopUpText;
+
+                globalUserStatusLoaded          = true;
+            } else{
+                //error
+            }
+            consoleLog("after ajax globalUserStatusLoaded: " + globalUserStatusLoaded);
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function urlContainString(txt){
+    txt = txt.toLowerCase();
+    consoleLog("running urlContainString for: " + txt);
+    var path = $(location).attr('href').toLowerCase();
+    consoleLog(path);    
+    var found = path.indexOf(txt);    
+    consoleLog(found);
+     if(found == -1){
+        return false;
+    }
+    return true;
+}
+
+function getVectorIdFromURL(){
+
+    var data = "";
+    var path = $(location).attr('href').split("/");
+    var domain = path[2].split("."); 
+
+    switch (domain[0]){
+        case "www": 
+            //Preview
+            if((path[3] ==  "vectors" || path[3] ==  "editables" || path[3] ==  "png-svg" || path[3] ==  "psd" ) && path[4] ==  "preview"){
+                data = path[5];
+            }else if(path[3] ==  "download-png-svg" || path[3] ==  "download-vector"){ //Downloads
+                data = path[4];
+            }
+            break;
+        case "es": 
+            //Preview
+            if((path[3] ==  "vectores" || path[3] ==  "editables" || path[3] ==  "svg-png" || path[3] ==  "psd" ) && path[4] ==  "vista-previa"){
+                data = path[5];
+            }else if(path[3] ==  "download-png-svg" || path[3] ==  "descargar-vector"){ //Downloads
+                data = path[4];
+            }
+            break;
+        case "br": case "":
+            //Preview
+            if((path[3] ==  "vetores" || path[3] ==  "editables" || path[3] ==  "png-svg" || path[3] ==  "psd" ) && path[4] ==  "previsualizar"){
+                data = path[5];
+            }else if(path[3] ==  "download-png-svg" || path[3] ==  "baixar-vetor"){ //Downloads
+                data = path[4];
+            }
+            break;
+        default:
+            //Preview
+            if((path[3] ==  "vectors" || path[3] ==  "editables" || path[3] ==  "png-svg" || path[3] ==  "psd" ) && path[4] ==  "preview"){
+                data = path[5];
+            }else if(path[3] ==  "download-png-svg" || path[3] ==  "download-vector"){ //Downloads
+                data = path[4];
+            }       
+    }
+
+    return data;
+}
+
+function updateUserData(user){//This function is called just before redirecting
+    consoleLog("Sending Beacon");
+    var data = JSON.stringify(user);
+    consoleLog(data);
+    var result = navigator.sendBeacon("/ajax/vexels-api/update-user-data/", data);
+    consoleLog("Beacon Sent");
+    return result;
+}
+
+function setPaymentFailureShowNoMore(idUser){
+    $("#close_purchase_step_1").click();
+
+    $("#purchase_modal_title").html(purchase_modal_title_orig);
+    $("#payment_method_title").html(payment_method_title_orig);
+    $("#notification_container").html("");
+
+    $.cookie(paymentFailureCookieName + idUser, "show_no_more_" + idUser, { expires: 99999, path: '/' });
+}
+
+function checkPaymentFailure(idUser){
+    consoleLog("running checkPaymentFailure for " + idUser);
+    if($.cookie(paymentFailureCookieName + idUser) && $.cookie(paymentFailureCookieName + idUser) == "show_no_more_" + idUser){
+        consoleLog("Payment Failure Cookie: " + $.cookie(paymentFailureCookieName + idUser));
+        return;
+    } else{
+        consoleLog("Cookie not found, continue with check.");
+    }
+
+    if(globalUserStatusLoaded){
+        if(globalUserPaymentFailure){
+            consoleLog("Payment Failure detected");
+            var msg = "Due to a problem with your payment method, <b>your subscription and merchandise licenses aren't active</b>. Reasons might be:  Insufficient Founds / Expired Card / Bank Rejection.";
+            var outstanding = "";
+
+            var html = "";
+            html += '<div class="blk--profile-notifi blk--profile-warning" style="margin-top:20px;">';
+            html += '   <div><img width="30" src="img/assets/warning.svg" alt=""></div><div>' + msg + '<span> ' + outstanding + '</span></div>';
+            html += '</div>';
+
+            purchase_modal_title_orig = $("#purchase_modal_title").html();
+            payment_method_title_orig = $("#payment_method_title").html();
+
+            $("#purchase_modal_title").html("PAYMENT METHOD ERROR");
+            $("#payment_method_title").html("TO CONTINUE ENJOYING VEXELS UPDATE YOUR PAYMENT METHOD:");
+            $("#notification_container").html(html);
+            $("#no_more_show_container").html('<div style="text-align: center;margin-bottom: 15px;"><label><input role="button" onclick="setPaymentFailureShowNoMore(' + globalUserLoggedId + ');" type="checkbox"><label>Don`t show this again. I´ll keep my subscription off by now.</label></label></div>');
+            startPurchaseFlow(globalUserPlanId);
+        } else{
+            consoleLog("Payment Failure NOT detected");
+        }
+    } else{
+        consoleLog("waiting for checkPaymentFailure");
+        setTimeout(function(){
+            checkPaymentFailure(idUser);
+        }, loopInterval);
+    }
+}
+
+function actionOnNOTLoggedIn(){
+    consoleLog("actionOnNOTLoggedIn");
+    $(".featured-list__item").find(".hover-btn__fav").unbind( "click" ).click(function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        forceLoginForLike("'" + displayVectors.join("__") + "'");
+    });
+
+    $(".fav_container").find(".hover-btn__fav").unbind( "click" ).click(function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        forceLoginForLike("'" + displayVectors.join("__") + "'");
+    });
+}
+
+function forceLoginForLike(arrVectors){
+    consoleLog("actionOnNOTLoggedIn");
+    setAfterLoginJS("checkLikeVectors", arrVectors);
+    ga('gtag_UA_11547268_1.send', 'event', 'login_like_vector', 'login', 'favorites');
+    $("#v-join").modal('show');
+}
+
+function toggleOptions(element) {
+    $(element).siblings(':hidden').toggle();
+    $(element).toggle();
+}
+
+function showEditorialMessage(){
+    message = "This content feature well-known brands, trademarks, logos, public personalities, and/or celebrities. It can be used only for editorial purposes (such as news, magazines, etc) or if you are an authorized reseller.  Learn more on our <a target='_blank' href='/terms-and-conditions/'>Terms & Conditions</a>.";
+    title = "CONTENT FOR EDITORIAL USE ONLY";
+    displayGlobalMessage(message, title);
+}
+
+function toggleOptions(element) {
+    $(element).siblings(':hidden').toggle();
+    $(element).toggle();
+}
+
+function checkLikeVectors(arrVectors){
+
+    consoleLog("checkLikeVectors");
+    consoleLog(arrVectors);
+
+    $(".featured-list__item").find(".hover-btn__fav").unbind( "click" ).click(function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        likeVector(loggedUserId, $(this).closest("article").data("vectorid"), "1");
+    });
+
+    $(".fav_container").find(".hover-btn__fav").unbind( "click" ).click(function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        likeVector(loggedUserId, $(this).closest(".fav_container").data("vectorid"), "1");
+    });
+
+    $.ajax({
+        url:    '/ajax/vexels-api/check-like-vectors/',
+        type:     'post',
+        async: true,
+        data:     {idUser: loggedUserId, arrVectors: arrVectors},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            $.each(data.result, function(key, value){
+                consoleLog("marking: " + value);
+                $(".art_id_" + value).addClass("favorited");
+                $(".art_id_" + value).find(".hover-btn__fav").unbind( "click").click(function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                    likeVector(loggedUserId, value, "0");
+                });
+            });
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function likeVector(idUser, idVector, action){//action => 1=LIKE, 0=UNLIKE
+
+    if(action == '1'){
+        $(".art_id_" + idVector).addClass("favorited");
+        ga('gtag_UA_11547268_1.send', 'event', 'like_vector', idVector, 'favorites');
+    } else{
+        $(".art_id_" + idVector).removeClass("favorited");
+        ga('gtag_UA_11547268_1.send', 'event', 'unlike_vector', idVector, 'favorites');
+    }
+
+    $.ajax({
+        url:    '/ajax/vexels-api/like-vector/',
+        type:     'post',
+        async: true,
+        data:     {idUser: idUser, idVector: idVector, action: action},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            if(data.post.action == "1"){
+                $(".art_id_" + data.post.idVector).addClass("favorited");
+                $(".art_id_" + data.post.idVector).find(".hover-btn__fav").unbind( "click").click(function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                    likeVector(loggedUserId, data.post.idVector, "0");
+                });
+            } else{
+                $(".art_id_" + data.post.idVector).removeClass("favorited");
+                $(".art_id_" + data.post.idVector).find(".hover-btn__fav").unbind( "click").click(function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                    likeVector(loggedUserId, data.post.idVector, "1");
+                });
+            }
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function loadSVGInline(idVector){
+
+    consoleLog("loadSVGInline for: " + idVector);
+    
+    return $.ajax({
+        url:    '/ajax/vexels-api/load-svg-inline/',
+        type:     'post',
+        async:      false,
+        data:     {idVector: idVector},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    }).responseText;
+}
+
+function showHideOnCondition(condition, show, hide){
+    consoleLog("showHideOnCondition show: " + show + " hide: " + hide);
+
+    if(globalUserStatusLoaded){
+        var globalCondition;
+
+        switch(condition) {
+            case "login":
+                globalCondition = globalUserIsLogged;
+                break;
+            case "merch":
+                globalCondition = false;
+                if(globalUserPlanType == "MERCH"){
+                    globalCondition = true;
+                }            
+                break;
+            case "pro":
+                globalCondition = false;
+                if(globalUserPlanType == "PRO"){
+                    globalCondition = true;
+                }            
+                break;
+            case "ext":
+                globalCondition = false;
+                if(globalUserPlanType == "EXT"){
+                    globalCondition = true;
+                }            
+                break;
+            default:
+                globalCondition = false;
+        } 
+
+        if(globalCondition){
+            $.each(show, function(index, value){
+                consoleLog("showing: " + value);
+                $(value).show();
+            });
+            $.each(hide, function(index, value){
+                consoleLog("hidding: " + value);
+                $(value).hide();
+            });
+        }
+    } else{
+        consoleLog("waiting for showHideOnCondition");
+        setTimeout(function(){
+            showHideOnCondition(condition, show, hide);
+        }, loopInterval);
+    }
+}
+
+function loadRandomIstockLink(container){
+
+    consoleLog("loadRandomIstockLink for: " + container);
+
+    if (!$("." + container).length){
+        consoleLog(container + " does not exist");
+        return;
+    }
+
+    if(globalUserStatusLoaded){
+        $("." + container + " a").prop("href", globalIStockLink);
+    } else{
+        consoleLog("waiting for loadRandomIstockLink");
+        setTimeout(function(){
+            loadRandomIstockLink(container);
+        }, loopInterval);
+    }
+}
+
+function validateVectorLicence(idVector, callback_success, callback_fail){
+    consoleLog("running validateVectorLicence for vector: " + idVector);
+
+    if(globalUserStatusLoaded){
+        consoleLog("globalUserHasLicence: " + globalUserHasLicence);
+        consoleLog("globalUserIsSubscriptor: " + globalUserIsSubscriptor);
+        if(globalUserHasLicence || globalUserIsSubscriptor){
+            if (typeof window[callback_success] === "function"){
+                    consoleLog("User is subscriptor, running callback: " + callback_success); 
+                    executeFunctionByName(callback_success, window, []);
+            } else{
+                consoleLog("User is subscriptor, but NO callback is defined for this scenario"); 
+            }
+        } else{
+            if (typeof window[callback_fail] === "function"){
+                consoleLog("User has NO licence, running callback: " + callback_fail); 
+                executeFunctionByName(callback_fail, window, []);
+            } else{
+                consoleLog("User has NO licence, but NO callback is defined for this scenario"); 
+            }
+        }
+    } else{
+        consoleLog("waiting for validateVectorLicence");
+        setTimeout(function(){
+            validateVectorLicence(idVector, callback_success, callback_fail);
+        }, loopInterval);
+    }
+}
+
+function checkSessionNoCredit(){
+
+    consoleLog("checking session no credit");
+
+    $.ajax({
+        url:    '/ajax/vexels-api/check-session-no-credit/',
+        type:     'post',
+        async: false,
+        data:     {},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            if(data.userHasNoCredit){
+                displayGlobalMessage("You have not enough credit. Please upgrade your acount.", "Notification!!");
+            }
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function checkUserCredit(callback_success, callback_fail){
+
+    consoleLog("checking user credit");
+
+    $.ajax({
+        url:    '/ajax/vexels-api/check-user-credit/',
+        type:     'post',
+        async: false,
+        data:     {callback_success: callback_success, callback_fail: callback_fail},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            executeFunctionByName(data.callbackFunction, window, [])
+            userHasCredit = data.hasCredit;
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function getUserSubscriptionStatus(callback_success, callback_fail){
+
+    consoleLog("running getUserSubscriptionStatus with arguments " + JSON.stringify(arguments) + " - TypeOf callback_success: " + typeof window[callback_success] + " - TypeOf callback_fail: " + typeof window[callback_fail]);
+
+    if(globalUserStatusLoaded){
+        if(globalUserIsSubscriptor){
+            if (typeof window[callback_success] === "function"){
+                consoleLog("User is subscriptor, running callback: " + callback_success); 
+                executeFunctionByName(callback_success, window, []);
+            } else{
+                consoleLog("User is subscriptor, but NO callback is defined for this scenario"); 
+            }
+        } else{
+            if (typeof window[callback_fail] === "function"){
+                consoleLog("User is NOT subscriptor, running callback: " + callback_fail); 
+                executeFunctionByName(callback_fail, window, []);
+            } else{
+                consoleLog("User is NOT subscriptor, but NO callback is defined for this scenario"); 
+            }
+        }
+    } else{
+        consoleLog("waiting for getUserSubscriptionStatus");
+        setTimeout(function(){
+            getUserSubscriptionStatus(callback_success, callback_fail);
+        }, loopInterval);
+    }
+}
+
+function runIfNOTSubscriptor(){
+    consoleLog("showing shutter");
+    $(".no-pro-content").show();
+}
+
+function runIfSubscriptor(){
+    consoleLog("hidding shutter");
+    $(".no-pro-content").hide();
+}
+
+function setLastViewedVector(idVector){
+
+    consoleLog('setLastViewedVector');
+
+    $.ajax({
+        url:    '/ajax/vexels-api/set-last-viewed-vector/',
+        type:     'post',
+        data:     {idVector: idVector},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+
+/* TODO: Check this flow and look for optimization. Plan and subscription status can be loaded in first ajax call. Also change enpoint name. */
+function startPurchaseFlow(idPlan, idVector, vectorName){
+    consoleLog("purchasing plan: " + idPlan + " and vector: " + idVector + " - " + vectorName);
+    $('#dvLoading').fadeIn();
+    var args = "";
+    if(idVector){
+        args = idPlan + "@@@" + idVector + "@@@" + vectorName;
+    } else{
+        args = idPlan;
+    }
+
+    consoleLog("final args: " + args);
+
+    $.ajax({
+        url:    '/ajax/vexels-api/get-bs-token/',
+        type:     'post',
+        data:     {args: args},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            setUpBlueSnap(data.token);
+            //bluesnap.hostedPaymentFieldsCreation (data.token, bsObj);
+            if(data.error == "not_logged_in"){
+                consoleLog("Error - Not Logged in");
+                $('#dvLoading').fadeOut();
+                displayGlobalMessage("Error - Not Logged in.", "Error");
+                return false;
+            }
+
+            if(data.error == "already_has_licence"){
+                consoleLog("Error - User already has licence for this vector");
+                $('#dvLoading').fadeOut();
+                //alert("Error - Please try registering manually.");
+                displayGlobalMessage("You already has licence for this vector", "Error");
+                return false;
+            }
+
+            if(data.token == ""){
+                consoleLog("Error retreiving Token");
+                displayGlobalMessage("Error - Please contact Admin.", "Error");
+                $('#dvLoading').fadeOut();
+            } else{
+                $("#token_hidden").val(data.token);
+
+                $("#bluesnap-hosted-iframe-ccn").css("height", "40px");
+                $("#bluesnap-hosted-iframe-ccn").css("width", "50%");
+                $("#bluesnap-hosted-iframe-ccn").css("background-color", "#FFF");
+
+                $("#bluesnap-hosted-iframe-exp").css("height", "40px");
+                $("#bluesnap-hosted-iframe-exp").css("width", "65%");
+                $("#bluesnap-hosted-iframe-exp").css("background-color", "#FFF");
+
+                $("#bluesnap-hosted-iframe-cvv").css("height", "40px");
+                $("#bluesnap-hosted-iframe-cvv").css("width", "50%");
+                $("#bluesnap-hosted-iframe-cvv").css("background-color", "#FFF");
+
+                var args = data.args.split("@@@");
+
+                $("#bluesnap-form input[name=idPlan]").val(args[0]);
+                if(args[1]){
+                    $("#bluesnap-form input[name=idVector]").val(args[1]);
+                    $("#bluesnap-form input[name=redirectVector]").val(args[1]);
+                    $("#bluesnap-form input[name=vectorName]").val(args[2]);
+                }
+                $("#bluesnap-form input[name=idUser]").val(data.idUser)
+                consoleLog("Setting idUser: " + data.idUser);
+                getPlanInfo(args[0], data.idUser);
+                loggedUserId = data.idUser;
+                //Since I have to do another ajax call in getPlanInfo, I do not hide the loader here.
+                //$('#dvLoading').fadeOut();
+            }
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function makeIStockSearchSearchPage(searchTerm, order, page, pageSize){
+
+    consoleLog("Making IStock Search");
+    if(!urlContainString("free-vectors")){
+        $(".shutter_container").html(getIStockLoader('top'));
+        $(".shutter_container").show();
+    } else{
+        $(".shutter_container").hide();
+        $(".shutter_container_top").hide();
+    }
+    //applyListFlex("shutter_container", "shutter-list__item", 120, 1, 1);
+
+    $.ajax({
+        url:    '/ajax/vexels-api/make-istock-search/',
+        type:     'post',
+        async: false,
+        data:     {searchTerm: searchTerm, order: order, page: page, pageSize: pageSize},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            if(!data.error){
+                var images = data.images;
+                //$(".shutter_container").html("");
+                var row = "";
+                var i=0;
+
+                $.each(images, function( key, image){
+                    consoleLog(JSON.stringify(image));
+
+                    if(i++==0){
+                        consoleLog(image);
+                    }
+
+                    row += '<div class="shutter-list-single__item shutter-list__item" data-w="' + image.width + '" data-h="' + image.height + '">';
+                    row += '    <a data-id="' + image.id + '" rel="nofollow" target="_blank" href="' + image.referalLink + '" data-rel="" onclick="javascript:ga(\'gtag_UA_11547268_1.send\', \'event\', \'shutter\', \'search\',\'' + image.analiticsTracker + '\'});" style="background-image:url(' + image.imageSrc + ');background-size: cover;" alt="' + image.caption + '" title="' + image.title + '">';
+                    row += '   </a>';
+                    row += '</div>';
+                });
+                consoleLog("Replacing shutter_container html");
+                $(".shutter_container").html(row);
+
+                consoleLog("shutter_container data disabled: " + $(".shutter_container").data("disabled"));
+                if($(".shutter_container").data("disabled") != "disabled"){
+                    $(".shutter_container_top").show();
+                    $(".shutter_container").show();
+                    applyListFlex("shutter_container", "shutter-list__item", 120, 1, 1);
+                } else{
+                    $(".shutter_container").hide();
+                    $(".shutter_container_top").hide();
+                }
+
+            } else{
+                //error
+                consoleLog(data.error);
+                if($(".shutter_container").data("disabled") != "disabled"){
+                    $(".shutter_container").show();
+                } else{
+                    $(".shutter_container").hide();
+                }
+            }
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function getIStockLoader(position){
+
+    return getIStockStaticContent();
+
+    /*if(position == "top"){
+        return '<span style="padding: 0 3px; display: inline-block;">Loading...</span>';
+    } else if(position == "side"){
+        return '<span style="padding: 0 3px; color: white; font-weight:bold; display: inline-block;">Loading...</span>';
+    } else{
+        return '<span style="padding: 0 3px; display: inline-block;">Loading...</span>';
+    }*/
+}
+
+function getIStockStaticContent(){
+
+    var html="";
+    for(i=0;i<=4;i++){
+        html += '<div class="blur-istock loading inline-loading shutter-list-single__item shutter-list__item" data-w="381" data-h="132" style="width: 381px; height: 132px; display: block;">';
+        html += '   <a style="background-image:url(/img/images/istock_logo.png);background-size: cover;" >   </a>';
+        html += '</div>';
+    }
+    html = "<div class='loading inline-loading'></div>";
+    return html;
+}
+
+function makeIStockSearchSideFrame(searchTerm, order, page, pageSize, parentVectorId){
+
+    consoleLog("Making IStock Search");
+
+    $.ajax({
+        url:    '/ajax/vexels-api/make-istock-search/',
+        type:     'post',
+        data:     {searchTerm: searchTerm, order: order, page: page, pageSize: pageSize, parentVectorId: parentVectorId},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            if(!data.error){
+                var images = data.images;
+                //$(".shutter-list").html("");
+                var row = "";
+
+                $.each(images, function( key, image){
+                    consoleLog(JSON.stringify(image));
+
+                    row += '<a data-id="' + image.id + '" alt="' + image.caption + '" title="' + image.title + '" rel="nofollow" target="_blank" class="shutter-list__item " ';
+                    row += 'href="' + image.referalLink + '" data-rel="" data-w="' + image.width + '" data-h="' + image.height + '" ';
+                    row += 'onclick="javascript:ga(\'gtag_UA_11547268_1.send\', \'event\', \'shutter\', \'vectors\', \'' + image.analiticsTracker + '\');" ';
+                    row += 'style="background-image: url(' + image.imageSrc + '); background-size: cover; width: 189px; height: 189px; display: block;">    ';
+                    row += '</a>';
+
+                });
+                var searchUrl = 'http://www.istockphoto.com/photos/' + data.usedSearchTerm + '?phrase=' + data.usedSearchTerm + '&excludenudity=true&sort=best';
+                var seeMore = data.randomLink;//"http://istockphoto.7eer.net/c/411244/258824/4205?u=" + searchUrl;
+                seeMore = '<a href="' + seeMore + '" class="seemore-button btn btn--dark btn--ftr" target="_blank">+ See  More</a>';
+                $(".content-istock").append(seeMore);
+
+                $(".shutter-list").html(row);
+
+                consoleLog("shutter_container data disabled: " + $(".shutter_container").data("disabled"));
+                if($(".shutter-list").data("disabled") != "disabled"){
+                    $(".shutter-list").show();
+                    consoleLog("isSvgPng: " + isSvgPng);
+                    applyListFlex("shutter-list", "shutter-list__item", 190, 1, null);
+
+                    if(isSvgPng){
+                        applyListFlex("isolated-list", "featured-list__item", 190, 1, null);
+                    } else{
+                        applyListFlex("featured-list", "featured-list__item", 260, 1, null);
+                    }
+                } else{
+                    $(".shutter-list").hide();
+                }
+
+            } else{
+                //error
+                consoleLog("shutter_container data disabled: " + $(".shutter_container").data("disabled"));
+                if($(".shutter-list").data("disabled") != "disabled"){
+                    $(".shutter-list").show();
+                } else{
+                    $(".shutter-list").hide();
+                }
+            }
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function applyListFlex(containerClass, elementClass, height, truncate, rows){
+    consoleLog("reordering: " + containerClass + ", height: " + height);
+
+    if(rows != null){
+        $("." + containerClass).each(function() {
+            $(this).flexImages({
+                //rowHeight: height,
+                truncate: truncate,
+                maxRows: rows,
+                container: "." + elementClass
+            })
+        });
+    } else{
+        $("." + containerClass).each(function() {
+            $(this).flexImages({
+                rowHeight: height,
+                truncate: truncate,
+                container: "." + elementClass
+            })
+        });
+    }
+}
+
+function checkSubscriptionStatus(){
+    consoleLog("running checkSubscriptionStatus");
+    if(globalUserStatusLoaded){
+        consoleLog("showBecomeProBanner: " + showBecomeProBanner);
+        if(globalUserIsSubscriptor || globalUserHasLicence){
+            consoleLog("here I do NOT show the banner");
+            $("#sticky-Left-Banner").hide();
+        } else{
+            consoleLog("here I show the banner");
+            if(showBecomeProBanner) $("#sticky-Left-Banner").show();
+            if(globalUserIsLogged) checkPaymentFailure(globalUserLoggedId);
+        }
+        consoleLog("current is_subscriptor field value: " + $("#is_subscriptor").val());
+        if(globalUserIsSubscriptor){
+            consoleLog("User is subscriptor, setting is_subscriptor field to yes");
+            $("#is_subscriptor").val("yes");
+        }
+        consoleLog("New is_subscriptor field value: " + $("#is_subscriptor").val());
+    } else{
+        consoleLog("waiting inside checkSubscriptionStatus");
+        setTimeout(checkSubscriptionStatus, loopInterval);
+    }
+}
+
+function dispatchPromptNotification(){
+    consoleLog("running dispatchPromptNotification");
+
+    if(globalUserStatusLoaded){
+        if(globalPromptPopUp){
+            if(globalPromptPopUpText != ""){
+                consoleLog("Prompt Notification Found: " + globalPromptPopUpText);
+                var title = "Message";
+                if(globalPromptPopUpTitle != "") title = globalPromptPopUpTitle;
+                $("#dismiss_prompt").show();
+                displayGlobalMessage(globalPromptPopUpText, title);
+            } else{
+                consoleLog("Global Message NOT Found");
+            }
+        }
+    } else{
+        consoleLog("waiting for dispatchPromptNotification");
+        setTimeout(dispatchPromptNotification, loopInterval);
+    }
+}
+
+function dismissPendingNotification(type){
+
+    consoleLog("dismissPendingNotification type: " + type);
+    $("#close_global_message").click();
+
+    $.ajax({
+        url:    '/ajax/vexels-api/dismiss-pending-notification/',
+        type:     'post',
+        data:     {type: type},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            $("#message_title").html("");
+            $("#message_content").html("");
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+
+}
+
+function dispatchGlobalMessage(){
+    consoleLog("running dispatchGlobalMessage");
+
+    if(globalUserStatusLoaded){
+        if(globalMessage != ""){
+            consoleLog("Global Message Found: " + globalMessage);
+            var title = "Message";
+            if(globalMessageTitle != "") title = globalMessageTitle;
+            displayGlobalMessage(globalMessage, title);
+        } else{
+            consoleLog("Global Message NOT Found");
+        }
+    } else{
+        consoleLog("waiting for dispatchGlobalMessage");
+        setTimeout(dispatchGlobalMessage, loopInterval);
+    }
+}
+
+function displayGlobalMessage(message, title){
+    consoleLog("Global Message: " + message + ", title: " + title);
+    if (title != ""){
+        $("#message_title").html(title);
+    } else {
+        $("#message_title").html("Messege");
+    }
+    $("#message_content").html(message);
+    $("#message-modal").modal("show");
+    //alert(message);
+}
+
+function checkIfUserSubscriptor(idUser, idPlan){
+
+    $('#dvLoading').fadeIn();
+    consoleLog("checking already owned for idUser: " + idUser + ", and idPlan: " + idPlan);
+
+    $.ajax({
+        url:    '/ajax/vexels-api/is-user-subscriptor/',
+        type:     'post',
+        data:     {idUser: idUser, idPlan: idPlan},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            if(data.isSubscriptor){
+                consoleLog("User already has licence for this vector");
+                setAfterLoginJS("", "");
+                setTimeout('window.location.reload()', 2000);
+            } else{
+                loadPayPalData();
+                if(forcePayPalPurchase){
+                    forcePayPalPurchase = false;
+                    goTo_paypal();
+                } else{
+                    forcePayPalPurchase = false;
+                    $("#purchase-step-1").modal('show');
+                }
+            }
+            $('#dvLoading').fadeOut();
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+
+}
+
+function setTransactionResult(result, redirect_url){
+    consoleLog(result + " - " + redirect_url);
+    $('#dvLoading').fadeOut();
+    if(result == 'success'){
+        window.location.href = redirect_url;//$("#url_download").attr("href");
+    } else{
+        displayGlobalMessage(result, "");
+    }
+
+}
+
+function processPayment(){
+    consoleLog("processing payment");
+    if($("#idPlan").val() != ""){
+        submitPaymentData();
+    } else{
+        consoleLog("Plan id is missing.");
+        displayGlobalMessage("An error has ocurred. Please try again later.", "Error");
+    }
+}
+
+function forceLoginForPurchase(idPlan, idVector, vectorName){
+    consoleLog("forceing login for purchasing plan: " + idPlan + " and vector: " + idVector + " - " + vectorName);
+    $(".modal").modal('hide');
+    //setAfterLoginModal("purchase-step-1");
+    setAfterLoginJS("startPurchaseFlow", idPlan+"@@@"+idVector+"@@@"+vectorName);
+    $("#v-join").modal('show');
+
+}
+
+function validateUserLogIn(callback_success, args_success, callback_fail, args_fail, idVector){
+
+    consoleLog("running validateUserLogIn");
+
+    if(globalUserStatusLoaded){
+
+        var callback = "";
+        var args = "";
+
+        if(globalUserIsLogged){
+            
+            /* This is for retro compatibility */
+            loggedUserId = globalUserLoggedId;
+            user_has_licence = globalUserHasLicence;
+            isSubscriptor = globalUserIsSubscriptor;           
+            /***********************************/
+
+            if(callback_success) callback = callback_success;
+            if(args_success) args = args_success;
+            consoleLog("User " + loggedUserId + " is logged in");
+        } else{
+            loggedUserId = "";           
+            if(callback_fail) callback = callback_fail;
+            if(args_fail) args = args_fail;
+            consoleLog("User is NOT logged in");
+        }
+
+        if(callback){
+            if (typeof window[callback] === "function"){
+                consoleLog("User is logged, running callback: " + callback); 
+                executeFunctionByName(callback, window, args);
+            } else{
+                consoleLog("User is logged, but NO valid callback is defined for this scenario"); 
+            }
+        } else{
+            consoleLog("no callback");
+        }
+    } else{
+        consoleLog("waiting for validateUserLogIn");
+        setTimeout(function(){
+            validateUserLogIn(callback_success, args_success, callback_fail, args_fail, idVector);
+        }, loopInterval);
+    }
+}
+
+function populateUserData(){
+    consoleLog("running populateUserData");
+
+    if(globalUserStatusLoaded){
+        if(globalUserIsLogged){
+
+            $(".v-nav__userblk").show();
+            $(".v-nav__elm--join").hide();
+            $(".v-nav__elm--login").hide();
+
+            $(".userblk__avatar").show();
+            $(".v-nav__elm--user").show().html(globalUserName).attr("title", globalUserNameFull).attr("alt", globalUserNameFull);
+
+            if(globalUserIsSubscriptor){
+                $(".pro__user").show();
+            } else{
+                $(".pro__user").hide();
+            }
+
+            if(globalUserAvatar != ""){
+                consoleLog("Avatar found, src: " + globalUserAvatar);
+                $(".avatar__user").attr('src', globalUserAvatar);
+                $(".avatar__user").attr('alt', globalUserName + " Avatar");
+                $(".avatar__user").attr('title', globalUserName + " Avatar");
+            } else{
+                consoleLog("Avatar not found");
+            }
+        } else{
+            $(".v-nav__userblk").hide();
+            $(".v-nav__elm--join").show();
+            $(".v-nav__elm--login").show();
+            $(".pro__user").hide();
+        }
+    } else{
+        consoleLog("waiting for populateUserData");
+        setTimeout(populateUserData, loopInterval);
+    }
+}
+
+function getPlanInfo(idPlan, idUser){
+
+    $('#dvLoading').fadeIn();
+    consoleLog('geting plan info.');
+    $.ajax({
+        url:    '/ajax/vexels-api/get-plan-info/',
+        type:     'post',
+        data:     {idPlan: idPlan, idUser: idUser},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            if(data.plan){
+                $("#amount").val(data.plan.cost);
+                $("#amount_show").html("USD " + data.plan.cost);
+                var frec = (data.plan.charge_frecuency == 'ANNUALLY')?"/year":"/month";
+                if(data.plan.recurrent=="1") {
+                    $("#amount_show").html( $("#amount_show").html() + frec );
+                    $("#redirectVector").val('');
+                }
+                $("#amount_show_paypal").html($("#amount_show").html());
+                $("#plan_name_paypal").html(data.plan.name);
+                $('#plan').val($('#idPlan').val());
+
+                $('#isSubscription').val('');
+
+                //I do not remove this code on purpose.
+                //Needs to be tested further
+                /*if(data.plan.id != 2 && data.plan.id != 7 && data.plan.id != 8 && data.plan.id != 9){
+                    $('#isSubscription').val('yes');
+                } else{
+                    $('#isSubscription').val('no');
+                }*/
+
+                if(data.plan.recurrent == "1"){
+                    $('#isSubscription').val('yes');
+                } else{
+                    $('#isSubscription').val('no');
+                }
+                consoleLog('#isSubscription: ' + $('#isSubscription').val());
+
+                checkIfUserSubscriptor(data.idUser, data.plan.id);
+            }
+            $('#dvLoading').fadeOut();
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function getAfterLoginModal(){
+
+    $('#dvLoading').fadeIn();
+    consoleLog('geting after login modal.');
+    $.ajax({
+        url:    '/ajax/vexels-api/get-after-login-modal/',
+        type:     'post',
+        data:     {},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            if(data.after_login_modal != ""){
+                $("#" + data.after_login_modal).modal('show');
+                setAfterLoginModal("");
+            }
+            $('#dvLoading').fadeOut();
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function getAfterLoginJS(){
+    consoleLog('running getAfterLoginJS');
+
+    if(globalUserStatusLoaded){
+        if(globalUserAfterLogInJs != ""){
+
+            consoleLog('After LogIn JS found: ' + globalUserAfterLogInJs);
+            var callbackFunction = globalUserAfterLogInJs;
+            var args = "";
+            if(globalUserAfterLoginJsArgs != "") args = globalUserAfterLoginJsArgs;
+            executeFunctionByName(callbackFunction, window, args);
+            consoleLog("after login callback called");
+            setAfterLoginJS("", "");
+        } else{
+            consoleLog('Aftr LogIn JS NOT found');
+        }
+         
+    } else{
+        consoleLog("waiting for getAfterLoginJS");
+        setTimeout(getAfterLoginJS, loopInterval);
+    }
+}
+
+function setAfterLoginJS(fnName, parameters){
+
+    //$('#dvLoading').fadeIn();
+    $.ajax({
+        url:    '/ajax/vexels-api/set-after-login-js/',
+        type:     'post',
+        data:     {afterLoginJS: fnName, args: parameters},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            $('#dvLoading').fadeOut();
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function setAfterLoginModal(modal){
+
+    $('#dvLoading').fadeIn();
+    $.ajax({
+        url:    '/ajax/vexels-api/set-after-login-modal/',
+        type:     'post',
+        data:     {afterLoginModal: modal},
+        beforeSend: function(request) {
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        },
+        statusCode: {
+              404: function() {
+                consoleLog('Could not contact server.');
+              },
+              500: function() {
+                consoleLog('A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            consoleLog(JSON.stringify(data));
+            $('#dvLoading').fadeOut();
+        },
+        fail:     function(error){
+            console.info(JSON.stringify(error));
+        }
+    });
+}
+
+function setCardHolderName(fullName){
+    var tmp = fullName.split(" ");
+    $("#firstName").val(tmp[0]);
+    $("#lastName").val(tmp[1]);
+    /*
+    for(i=1;i<tmp.length;i++){
+        $("#lastName").val($("#lastName").val() + tmp[i]);
+    }
+    */
+}
+
+function consoleLog(txt){
+    if(common_debug_console !== false) console.log(txt);
+}
+
+function consoleInfo(txt){
+    if(common_debug_console !== false) console.info(txt);
+}
+
+function executeFunctionByName(functionName, context, args) {
+    consoleLog("functionName: " + functionName);
+    consoleLog("args: " + args);
+
+    if(args && args.length > 0 ){
+        if(args.indexOf("@@@") > 0){
+            args = "'" + args.split("@@@").join("','") + "'";
+        }
+        consoleLog("new args: " + args);
+    } else{
+        args = "";
+    }
+
+    if (functionName == '') return false;
+
+    setTimeout(functionName + "(" + args + ")", 0);
+}
+
+function showEditColorModal(id) {
+  var response = loadSVGInline(id)
+  $('.canvas-container').empty();
+  $('.canvas-container').html(JSON.parse(response).result);
+  $('#edit-color-modal').modal('show');
+  // consoleLog(window.location.href);
+  javascript:ga('gtag_UA_11547268_1.send', 'event', 'color_editor', 'open', window.location.href);
+
+  var svgEl = $(".canvas-container svg"); 
+  var svgId = svgEl.attr("id");
+  document.svgId = svgId; 
+  displayGradients("gradients"); 
+  displayColors("colors");
+  var svg = $("#" + svgId)[0];
+  var height = svg.getBoundingClientRect().height;
+  $("#svgSize").val(height);
+  reloadSizeText();
+  initEditColorModal();
+}
+
+function setContactUs(){
+
+    $('#contactus-form').submit(function(e){
+
+        e.preventDefault();     
+        var error = false;
+        consoleLog("name: " + $(this).find('input[name="name"]').val());
+        if($(this).find('input[name="name"]').val() == ''){
+            error = true
+            $(this).find('input[name="name"]').addClass('err-msg-sec')
+                .click(function(){ $(this).removeClass('err-msg-sec'); })
+                .focusin(function(){$(this).removeClass('err-msg-sec'); });
+        }
+        consoleLog("subject: " + $(this).find('input[name="subject"]').val());
+        if($(this).find('input[name="subject"]').val() == ''){
+            error = true
+            $(this).find('input[name="subject"]').addClass('err-msg-sec')
+                .click(function(){ $(this).removeClass('err-msg-sec'); })
+                .focusin(function(){$(this).removeClass('err-msg-sec'); });
+        }
+        var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+        consoleLog("emailcontact: " + $(this).find('input[name="emailcontact"]').val());
+        if($(this).find('input[name="emailcontact"]').val() == '' || !emailPattern.test($(this).find('input[name="emailcontact"]').val())){
+            error = true
+            $(this).find('input[name="emailcontact"]').addClass('err-msg-sec')
+                .click(function(){ $(this).removeClass('err-msg-sec'); })
+                .focusin(function(){$(this).removeClass('err-msg-sec'); });
+        }
+        consoleLog("message: " + $(this).find('textarea[name="message"]').val());
+        if($(this).find('textarea[name="message"]').val() == ''){
+            error = true
+            $(this).find('textarea[name="message"]').addClass('err-msg-sec')
+                .click(function(){ $(this).removeClass('err-msg-sec'); })
+                .focusin(function(){$(this).removeClass('err-msg-sec'); });
+        }
+
+        if(!error){
+            var data = { 
+                    name: $(this).find('input[name="name"]').val(),
+                    email: $(this).find('input[name="emailcontact"]').val(),
+                    subject: $(this).find('input[name="subject"]').val(),
+                    message: $(this).find('textarea[name="message"]').val()
+                };
+            console.log(JSON.stringify(data));
+            $.post('/ajax/contact-us/', data, 
+                function(resp){
+                    if(resp.msg == 'ok'){
+                        $('#contactus-form').find('input[name="name"]').val('');
+                        $('#contactus-form').find('input[name="emailcontact"]').val('');
+                        $('#contactus-form').find('input[name="subject"]').val('');
+                        $('#contactus-form').find('textarea[name="message"]').val('');
+                        $('.close_contactus').click();
+                        displayGlobalMessage($("#message_sent").val(), "");
+                        consoleLog("contact message sent");
+                    }
+                }
+            );
+        } else{
+            //alert("error");
+            consoleLog("error validating contact form");
+        }
+        
+        return false;
+    });
+}
+
+function in_array(needle, haystack){
+    if($.inArray(needle, haystack) != -1){
+        return true;
+    } else{
+        return false;
+    }
+}
+
+/* PROTOTIPE OVERWRITES */
+
+Date.prototype.addDays = function (days) {
+    if (days) {
+        var dat = new Date(this.valueOf());
+        dat.setDate(dat.getDate() + days);
+        return dat;
+    }
+};

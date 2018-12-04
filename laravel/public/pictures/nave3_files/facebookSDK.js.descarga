@@ -1,0 +1,247 @@
+var afterLoginFunction = "";
+var loggedWithFacebook = false;
+var isFacebookRegistry = false;
+var alreadyLogged = false;
+var fb_debug_console = false;
+
+
+// This is called with the results from from FB.getLoginStatus().
+function statusChangeCallback(response) {
+  if(fb_debug_console) consoleLog('statusChangeCallback');
+  if(fb_debug_console) consoleLog(response);
+  // The response object is returned with a status field that lets the
+  // app know the current login status of the person.
+  // Full docs on the response object can be found in the documentation
+  // for FB.getLoginStatus().
+  if (response.status === 'connected') {
+    // Logged into your app and Facebook.
+    if(!alreadyLogged){
+      fb_login();
+    } else{
+        if(fb_debug_console) consoleLog("already logged");
+        //location.reload();
+    }
+  } else if (response.status === 'not_authorized') {
+    // The person is logged into Facebook, but not your app.
+    //document.getElementById('fbStatus').innerHTML = 'Please log ' + 'into this app.';
+    if(fb_debug_console) consoleLog('Please log ' + 'into this app.');
+  } else {
+    // The person is not logged into Facebook, so we're not sure if
+    // they are logged into this app or not.
+    //document.getElementById('fbStatus').innerHTML = 'Please log ' + 'into Facebook.';
+    if(fb_debug_console) consoleLog('Please log ' + 'into Facebook.');
+  }
+}
+
+function collectLogetUserData(data){
+    //alert(data.facebookid);
+    showUserFBImageByFBId(data.facebookid)
+}
+
+function showUserFBImageByFBId(fbId){
+    //alert(2222);
+    if (typeof FB !== 'undefined') {
+        FB.api(
+            "/" + fbId + "/picture",
+            function (response) {
+                if (response && !response.error) {
+                    $("#userPicture").attr("src", response.data.url);
+                    $("#userPicture").fadeIn(1500);
+                }else{
+                    //alert(JSON.stringify(response.error));
+                    if(fb_debug_console) consoleLog(JSON.stringify(response.error));
+                }
+            }
+        );
+    }
+}
+
+// This function is called when someone finishes with the Login
+// Button.  See the onlogin handler attached to it in the sample
+// code below.
+function checkLoginState() {
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+}
+
+(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/es_LA/all.js#xfbml=1&appId=308868272535767";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+window.fbAsyncInit = function() {
+    FB.Event.subscribe('auth.login', function(response) { 
+       //if(fb_debug_console) consoleLog("donde andaba el login");
+    });
+};
+
+
+var fbAccessToken = "";
+
+function fb_login(){
+    if(fb_debug_console) consoleLog("Doing FB login");
+    //fb_logout();
+    
+    FB.login(function(response) {
+        if (response.authResponse) {
+            alreadyLogged = true;
+            if(fb_debug_console) consoleLog("Logged In: " + response);
+            if(fb_debug_console) consoleLog('Welcome!  Fetching your information.... ');
+            //if(fb_debug_console) consoleLog(response); // dump complete info
+            access_token = response.authResponse.accessToken; //get access token
+            fbAccessToken = access_token;
+            user_id = response.authResponse.userID; //get FB UID
+            //alert(access_token);
+            //alert(user_id);
+            //if(fb_debug_console) consoleLog("access_token: " + access_token);
+            //if(fb_debug_console) consoleLog("user_id: " + user_id);
+            getFBUserInfo();
+        } else {
+            //user hit cancel button
+            if(fb_debug_console) consoleLog('User cancelled login or did not fully authorize.');
+
+        }
+    }, {
+        scope: 'public_profile, email'
+    });
+}
+
+function getFBUserInfo(){
+    try{
+        FB.api('/me',{fields: 'email, link, gender, first_name, id, name, last_name'}, function(response) {
+            if (response && !response.error) {
+                //if(fb_debug_console) consoleLog(response);
+                user_email = response.email; //get user email
+                // you can store this data into your database  
+
+                var lang = $('input[name="lang"]').val();
+
+                response.access_token = fbAccessToken; 
+                response.user_id = response.id; 
+                response.id_facebook = response.id;
+                response.username = response.email;
+                response.username_join = response.email;
+                response.lang = lang;
+
+                if(!response.id || response.id == ""){
+                    displayGlobalMessage("A Facebook-side error has occurred. Try another method in order to register/Login", "Facebook Error");
+                    return;
+                }
+
+                doFacebookLogIn(response);
+                FB.api(
+                    "/" + response.id + "/picture",
+                    function (response) {
+                        if (response && !response.error) {
+                              userProfilePicture = response.data.url;
+                        }else{
+                            if(fb_debug_console) consoleLog(response.error);
+                        }
+                    }
+                );
+            } else{
+              //alert(JSON.stringify(response.error));
+            }
+        }); 
+    } catch (e){
+        if(fb_debug_console) consoleLog("error: " + e.message);
+    }
+}
+
+var tmpUser = {};
+
+function doFacebookLogIn(user){
+    if(fb_debug_console) consoleLog(user);
+    tmpUser = user;
+
+    if(fb_debug_console) consoleLog("user FB: " + JSON.stringify(user));
+    if(!user.email || user.email == ""){
+        if(fb_debug_console) consoleLog('User did not share his email.');
+
+        var userTmp = "";
+        if(user.first_name && user.first_name != ""){
+            userTmp = user.first_name;
+        } else{
+            userTmp = user.id_facebook;
+        }
+
+        user.email = userTmp + "@"  + user.id_facebook + "_facebook_email_not_provided";
+        //displayGlobalMessage("You need to share your email in Facebook in order to register/Login", "Facebook Error");
+        //return;
+    }
+
+    if(isFacebookRegistry){
+        var url = "/ajax/signup/";
+        user.username_join = user.email;
+    } else{//is Login        
+        user = {'user_id':user.id_facebook, 'type_user_id':'facebook', 'username_login': user.email};
+        var url = "/ajax/login/";
+    }
+
+    if(fb_debug_console) consoleLog("user Obj: " + JSON.stringify(user));
+    if(fb_debug_console) consoleLog("url: " + url);
+
+    $.ajax({
+        url:    url,
+        type:     'post',
+        dataType:   'json',
+        data:     user,
+        statusCode: {
+              404: function() {
+                var message = 'Could not contact server.';
+                displayGlobalMessage(message, "");
+                if(fb_debug_console) consoleLog('doFacebookLogIn => Could not contact server.');
+              },
+              500: function() {
+                var message = 'A server-side error has occurred.';
+                displayGlobalMessage(message, "");
+                if(fb_debug_console) consoleLog('doFacebookLogIn => A server-side error has occurred.');
+              }
+        },
+        success:  function(data) {
+            if(fb_debug_console) consoleLog(JSON.stringify(data));
+            var message = data.msg;
+
+            if(data.opt == "do-login"){
+                if(fb_debug_console) consoleLog("Already registered, logging in");
+                isFacebookRegistry = false;
+                getFBUserInfo();
+            } else{               
+                if(data.res == "-1"){
+                    if(fb_debug_console) consoleLog("can not login, registering");
+                    isFacebookRegistry = true;
+                    getFBUserInfo();
+                } else{
+                    if(fb_debug_console) consoleLog("Success, reloading");
+                    location.reload();
+                } 
+            }   
+              
+          },
+          fail:     function(error){
+              $('#dvLoading').fadeOut();
+              if(fb_debug_console) consoleLog(JSON.stringify(error));
+          }
+    });
+}
+
+function fb_logout(){
+    try{
+        FB.getLoginStatus(function(response) {
+            if (response.status === 'connected') {
+                FB.logout(function(response) {
+                    // this part just clears the $_SESSION var
+                    // replace with your own code 
+                    if(fb_debug_console) consoleLog('Facebook logout succesfull');                   
+                });
+            }
+            loggedWithFacebook=false;
+        });
+    } catch(e){
+        if(fb_debug_console) consoleLog(e.message);
+    }
+}

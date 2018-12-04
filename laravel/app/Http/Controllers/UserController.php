@@ -55,7 +55,7 @@ class UserController extends Controller {
         }
         //Obtener datos del usuario
         $user = DB::table('usuarios')->where("id", $id)->first();
-        return view('index', ["users"=>$user, "compras"=>$compras, "objetos"=>$objetos, "recompensa"=>$recompensa])->with([$bought=false]);
+        return view('home', ["users"=>$user, "compras"=>$compras, "objetos"=>$objetos, "recompensa"=>$recompensa])->with([$bought=false]);
     }
     public function cambiarAvatarNave($id, $avatar, $nave){
         // Actualizamos los campos avatar y nave del usuario

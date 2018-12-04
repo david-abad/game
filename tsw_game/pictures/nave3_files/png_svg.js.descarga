@@ -1,0 +1,100 @@
+var shared = { position: {  my: 'bottom middle', at: 'top middle', adjust: { y: -2 } }, style: { classes: 'ui-tooltip-dark ui-tooltip-rounded simple_tips', tip: { width: 12, height: 6 }}};
+//var apiLatest = new api_photos();
+//var apiIStockVertical = new api_photos();
+//var apiSimilar = new api_photos();
+var automatedNext = null;
+var urlPay = "";
+var urlCancel = "";
+
+function bindEvents(){
+
+	$(".down_other_format").click(function(){
+
+		$("#download-btn").find('input[name="type"]').val($(this).data('format'));
+		
+		//consoleLog($(this).data('format'));
+		switch($(this).data('format')) {
+		    case "svg":
+		        ga('send', 'event', 'pngdownload', 'SVG', 'download');
+		        break;
+		    case "eps":
+		        ga('send', 'event', 'pngdownload', 'EPS', 'download');
+		        break;
+		    case "psd":
+		        ga('send', 'event', 'pngdownload', 'PSD', 'download');
+		        break;
+		    case "base64":
+		        ga('send', 'event', 'pngdownload', 'B64', 'download');
+		        break;
+		} 
+
+		if(!globalUserHasLicence){
+	    	consoleLog("user has NO licence, opening modal");
+	    	$("#download-btn").modal("open");
+	    } else{
+	    	consoleLog("user has licence, downloading");
+	    	$("#formFree").attr('target', '');
+			$("#formFree").submit();
+	    }	
+	});
+
+	$(".download-file a").click(function(){
+	    $("#download-btn").find('input[name="type"]').val('png');
+	    var size = $(this).parents("li").find("input.size-down").val();
+
+	    if(size < 16 || size > 5000){
+	    	
+	    	$(".alert-danger").slideDown();
+	    }else{
+	    	$(".alert-danger").slideUp();
+	    	//form free
+	      	$("#formFree").find('input[name="size"]').val(size);
+	    	
+	    	switch(size) {
+			    case 24:
+			        ga('send', 'event', 'pngdownload', 'PNG', '24');
+			        break;
+			    case 150:
+			        ga('send', 'event', 'pngdownload', 'PNG', '150');
+			        break;
+			    case 256:
+			        ga('send', 'event', 'pngdownload', 'PNG', '256');
+			        break;
+			    default:
+			        ga('send', 'event', 'pngdownload', 'PNG', 'custom');
+			        break;
+			}
+
+	    	//paypal	    	
+	    	$("#formPaypal").find('input[name="return"]').val( urlPay + "/"+size + "/" + $("#download-btn").find('input[name="type"]').val() );
+
+	    	if(!globalUserHasLicence){
+	    		consoleLog("user has NO licence, opening modal");
+				consoleLog("Type: " + $("#freeType").val());	
+				consoleLog("Size: " + $("#freeSize").val());
+
+	    		$("#download-btn").modal("open");
+	    		listenCopy();
+	    	} else{
+	    		consoleLog("user has licence, downloading");
+	    		$("#formFree").attr('target', '');
+	    		$("#formFree").submit();
+	    	}
+	    }
+	});
+
+	$(".free-download").click(function(){
+		$("#formFree").submit();
+	});
+
+
+	$(".more_details").click(function(){
+		$("#dinamic_credit_code").val($('.code-input[name="code"]').val());
+		$(".text-look").html("It'll will look like this:" + $('.code-input[name="code"]').val());
+	});
+
+}
+
+$(document).ready(function(){
+	consoleLog("isolated preview loaded");	
+});
