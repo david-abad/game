@@ -73,7 +73,7 @@ public static function getUserAuth(){
 
 	protected static function checkUser($userEmail,$userPass)
 	{
-		$db = new PDO("mysql:host=localhost;dbname=tsw","root","dany55");
+		$db = new PDO("mysql:host=localhost;dbname=tsw","root","");
 		$ps = $db -> prepare("SELECT name,email, password FROM users WHERE email = :email AND password = :pass");
 		$ps->execute([
 			':email' => $userEmail,
@@ -90,7 +90,7 @@ public static function getUserAuth(){
 	//Conexion a BD y va a getExistingUser a preguntar si el usuario ya existe(email) y si no lo ingresa
 	protected static function storeUser($userEmail,$userName,$userPass)
 	{
-		$db = new PDO("mysql:host=localhost;dbname=tsw","root","dany55");
+		$db = new PDO("mysql:host=localhost;dbname=tsw","root","");
 		$fecha = new DateTime();
 		$user = self::getExistingUser($userEmail,$db);
 		if ($user == null)

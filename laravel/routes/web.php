@@ -23,9 +23,13 @@ Route::get("/", function(){
     return view("index");
 });
 
+Route::post("/s", 'UserController@login');
+
 Route::get("/reg/reg", function(){
     return view("registro");
 });
+
+Route::post("/reg", 'UserController@register');
 
 Route::get('uan/{id}/{avatar}/{nave}', 'UserController@cambiarAvatarNave');
 Route::post('ul/{id}/{nivel}', 'UserController@subirDeNivel');

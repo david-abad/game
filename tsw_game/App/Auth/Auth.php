@@ -41,7 +41,7 @@ class Auth{
 
 	protected static function storeUser($service,$socialUser)
 	{
-		$db = new PDO("mysql:host=localhost;dbname=tsw","root","dany55");
+		$db = new PDO("mysql:host=localhost;dbname=tsw","root","");
 		$user = self::getExistingUser($socialUser,$db);
 		if ($user == null)
 		{

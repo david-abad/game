@@ -62,8 +62,7 @@
                		 </div> 
                		 <p></p>  
                		 
-               		  
-               		 <input href=juego.html name="btnEnviar" class="btn  btn-foursquare btn-lg text-center" type="submit" value="Registrar"/>
+               		 <input href="#" name="btnEnviar" class="btn  btn-foursquare btn-lg text-center" type="submit" value="Registrar"/>
                		 <p></p>
                		
 					

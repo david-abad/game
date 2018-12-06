@@ -33,7 +33,7 @@
 	<link rel="stylesheet"  href="assets/assets/css/bootstrap.css">
 	<link rel="stylesheet"  href="assets/assets/css/font-awesome.css">
 	<link rel="stylesheet"  href="assets/assets/css/bootstrap-social.css">
-	<script src="assets/assetss/js/jquery.js" charset="utf-8"></script>
+	<script src="assets/assets/js/jquery.js" charset="utf-8"></script>
 
 
 </head>

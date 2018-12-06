@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use DB;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use DateTime;
 
 class UserController extends Controller {
     public function index($id){
@@ -31,6 +32,7 @@ class UserController extends Controller {
             $recompensa = true;
         }
         $dia = $user->diaRecompensa;
+        $d1 = $dia;
         if($recompensa && !$recibida){
             $dia = $user->diaRecompensa + 1;
         }else{
@@ -42,11 +44,11 @@ class UserController extends Controller {
         DB::table('usuarios')->where("id", $id)->update(['diaRecompensa'=>$dia, 'ultimoLogin'=>$hoy]);
         if($recompensa){
             $add = 0;
-            if($dia == 1){
+            if($d1 == 1){
                 $add = 100;
-            }else if($dia < 5){
+            }else if($d1 < 5){
                 $add = 150;
-            }else if($dia < 7){
+            }else if($d1 < 7){
                 $add = 200;
             }else{
                 $add = 300;
@@ -101,5 +103,26 @@ class UserController extends Controller {
         $response = new \stdClass(); //Para evitar error: Creating default object from empty value
         $response->result = 'Ok';
         echo json_encode($response);
+    }
+    public function login(Request $request){
+        $user = DB::table('usuarios')->where([['nombre', '=', $request->email],
+        ['password', '=', $request->pass]])->first();
+        $response = new \stdClass();
+        $response->result = 'Nah';
+        if($user != NULL){
+            $response->result = 'Ok';
+            $response->id = $user->id;
+        }
+        return response()->json($response); 
+    }
+    public function register(Request $request){
+        date_default_timezone_set('America/Mexico_City');
+        $fecha = date("Y-m-d H:i:s");
+        DB::table('usuarios')->insert(
+            ['nombre' => $request->name, 'password' => $request->pass, 'ultimoLogin'=>'2018-11-01', 'created_at'=>$fecha]
+        );
+        $response = new \stdClass();
+        $response->result = 'Ok';
+        return response()->json($response); 
     }
 }

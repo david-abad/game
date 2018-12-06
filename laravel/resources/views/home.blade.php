@@ -27,7 +27,7 @@
             overflow-x: hidden;
         }
         body{
-            background-image: url("background.jpeg");
+            background-image: url("lvl1/background.png");
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
@@ -339,12 +339,12 @@
     <ul class="sidenav grey darken-4" id="mobile-demo">
         <li><a class="white-text indigo darken-3 valign-wrapper"><img id="avatar2" class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{$users->nombre }}</a></li>
         <li><a class="white-text valign-wrapper modal-trigger" data-target="modalAvatar">Cambiar avatar y nave</a></li>
-        <li><a class="white-text valign-wrapper">Cerrar sesión</a></li>
+        <li><a class="logout white-text valign-wrapper">Cerrar sesión</a></li>
     </ul>
     <!-- Dropdown Structure -->
     <ul id='user_dropdown2' class='dropdown-content grey darken-3'>
         <li class="dropdown_element"><a class="white-text modal-trigger" data-target="modalAvatar">Cambiar avatar y nave</a></li>
-        <li class="dropdown_element"><a class="white-text">Cerrar sesión</a></li>
+        <li class="dropdown_element"><a class="logout white-text">Cerrar sesión</a></li>
     </ul>
 </body>
 <!--JavaScript at end of body for optimized loading-->
@@ -360,6 +360,9 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
+        });
+        $(".logout").click(function(){
+            window.open("/", "_SELF");
         });
         $('.dropdown-trigger').dropdown({
             constrainWidth: false,
@@ -453,10 +456,6 @@
             
             // Calcular dia de recompensas
             var dia = {{$users->diaRecompensa}};
-            dia++;
-            if(dia==8){
-                dia = 1;
-            }
             for(var i = dia; i<8; i++){
                 var recom = $("#recom" + i);
                 recom.html("");

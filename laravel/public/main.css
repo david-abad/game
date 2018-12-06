@@ -1,52 +1,50 @@
-
 @import url('https://fonts.googleapis.com/css?family=Roboto');
-html{
-    
+
+html {
+
     font-size: 20px;
 }
-*{
-   box-sizing: inherit;
-    
+
+* {
+    box-sizing: inherit;
+
 }
-body{
+
+body {
     background-image: url("pictures/background.png");
-    background-repeat: repeat;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
     background-attachment: fixed;
-     font-family: 'Roboto', sans-serif;
-    
-    
-   
-    
+    font-family: 'Roboto', sans-serif;
 }
-img{
 
-position: center;
+img {
+
+    position: center;
 
 }
-.user-img{
+
+.user-img {
     margin-top: -130px;
     margin-bottom: 0px;
 
 }
 
-.user-img img {
+.user-img img {}
 
-    
+.modal-content {
 
-}
-.modal-content{
-
-background-color: #000000;
-opacity: .85; 
-padding: 0 20px;
+    background-color: #000000;
+    opacity: .85;
+    padding: 0 20px;
 
 }
 
 
-.imagen
-{
+.imagen {
 
-background-position: center;
+    background-position: center;
 }
 
 .main-section {
@@ -54,13 +52,13 @@ background-position: center;
     margin: 0 auto;
     margin-top: 20%;
     padding: 0;
-    
+
 
 }
 
-.sz{
+.sz {
 
-padding-left: 15px;
-padding-right: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
 
 }
