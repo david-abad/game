@@ -339,12 +339,12 @@
     <ul class="sidenav grey darken-4" id="mobile-demo">
         <li><a class="white-text indigo darken-3 valign-wrapper"><img id="avatar2" class="right valign" src= "img_obj/{{ $users->avatar }}" style="width:50px; padding:5px; margin-right: 10px;">{{$users->nombre }}</a></li>
         <li><a class="white-text valign-wrapper modal-trigger" data-target="modalAvatar">Cambiar avatar y nave</a></li>
-        <li><a class="white-text valign-wrapper">Cerrar sesión</a></li>
+        <li><a class="logout white-text valign-wrapper">Cerrar sesión</a></li>
     </ul>
     <!-- Dropdown Structure -->
     <ul id='user_dropdown2' class='dropdown-content grey darken-3'>
         <li class="dropdown_element"><a class="white-text modal-trigger" data-target="modalAvatar">Cambiar avatar y nave</a></li>
-        <li class="dropdown_element"><a class="white-text">Cerrar sesión</a></li>
+        <li class="logout dropdown_element"><a class="white-text">Cerrar sesión</a></li>
     </ul>
 </body>
 <!--JavaScript at end of body for optimized loading-->
@@ -388,6 +388,9 @@
                }
             });
         });
+        $(".logout").click(function(){
+            window.open("/home", "_self");
+        })
         $("#btnReiniciar").click(function(){
             $.ajax({
                 headers: {

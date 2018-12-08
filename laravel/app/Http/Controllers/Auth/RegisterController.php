@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\User;
+use DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -28,8 +29,13 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/login';
+   /* protected function redirectTo(){
 
+         $usuario = DB::table('usuarios')->where("nombre", $data['name'])->first();
+            $url = $usuario->id;
+            return '/login/'. $url;
+    }*/
     /**
      * Create a new controller instance.
      *
@@ -50,7 +56,7 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            //'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
     }
@@ -63,10 +69,100 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+
+        date_default_timezone_set('America/Mexico_City');
+        $hoy = date("Y-m-d");
+        
+             //$hoy = date("Y-m-d");
+            /* DB::table('usuarios')->insertGetID([
+             'nombre' => $data['name'],
+             'password' => Hash::make($data['password']),
+             'ultimoLogin' => $hoy
+             ]);
+            $usuario = DB::table('usuarios')->where("nombre", $data['name'])->first();
+            $url = $usuario->id;
+            $idk = '/login/' .$url;*/
+            //return redirect ($idk);x
+            
+            $createUser = User::firstOrCreate([
+            'nombre' => $data['name']
+            ],  [
+            'password' => $data['password'],
+            
+            
+            'ultimoLogin' => $hoy
+            ]
+        );
+            auth()->login($createUser);
+            //CREAR IF POR SI ES LA PRIMERA VEZ
+            $usuario = DB::table('usuarios')->where("nombre", $data['name'])->first();
+             $url = $usuario->id;
+             User::create([
+            'nombre' => $data['name'],
+            'password' => $data['password'],
+            'ultimoLogin' => $hoy,
+
+             ]);
+             //return redirect('/login/$url');
+            /*
+             return User::create([
+            'nombre' => $data['name'],
+            'password' => $data['password'],
+            'ultimoLogin' => $hoy,
+
+             ]);*/
+            
+            
+
+
+             /* $usuario = DB::table('usuarios')->where("nombre", $data['name'])->first();
+            $url = $usuario->id;
+            $idk = '/login/' .$url;*/
+            //return redirect()->route('login',['id' => $url]);
+         
+            //return redirect ('/home');
+            //echo "USUARIO YA REGISTRADO";
+
+        
+
+          /*  date_default_timezone_set('America/Mexico_City');
+        if(DB::table('usuarios')->where('nombre', $data['name'])->doesntExist())
+        {
+             $hoy = date("Y-m-d");
+             DB::table('usuarios')->insertGetID([
+             'nombre' => $data['name'],
+             'password' => Hash::make($data['password']),
+             'ultimoLogin' => $hoy
+             ]);
+            $usuario = DB::table('usuarios')->where("nombre", $data['name'])->first();
+            $url = $usuario->id;
+            return redirect ('/login/$url')->with('alert',"Bienvenido $createUser->name");
+        }
+        else
+        {
+            return redirect ('/home');
+        }*/
+
+
     }
+  /*  public function registro()
+    {
+        date_default_timezone_set('America/Mexico_City');
+        if(DB::table('usuarios')->where('nombre', $data['name'])->doesntExist())
+        {
+        $hoy = date("Y-m-d");
+          DB::table('usuarios')->insertGetID([
+            'nombre' => $data['name'],
+            'password' => Hash::make($data['password']),
+            'ultimoLogin' => $hoy
+            ]);
+          $usuario = DB::table('usuarios')->where("nombre", $data['name'])->first();
+        $url = $usuario->id;
+          return redirect ('/login/$url')->with('alert',"Bienvenido $createUser->name");
+        }
+        else{
+            return redirect ('/home');
+        }
+
+    }*/
 }

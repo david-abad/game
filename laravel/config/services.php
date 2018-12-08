@@ -38,6 +38,43 @@ return [
             'secret' => env('STRIPE_WEBHOOK_SECRET'),
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
+    
     ],
+    'facebook' => [
+    'client_id' => env('FACEBOOK_ID'),         // Your GitHub Client ID
+    'client_secret' => env('FACEBOOK_SECRET'), // Your GitHub Client Secret
+    'redirect' => env('FACEBOOK_URL'),
+    ],
+    'google' => [
+    'client_id' => env('GOOGLE_ID'),         // Your GitHub Client ID
+    'client_secret' => env('GOOGLE_SECRET'), // Your GitHub Client Secret
+    'redirect' => env('GOOGLE_URL'),
+    ],
+    'github' => [
+    'client_id' => env('GITHUB_ID'),         // Your GitHub Client ID
+    'client_secret' => env('GITHUB_SECRET'), // Your GitHub Client Secret
+    'redirect' => env('GITHUB_URL'),
+    ],
+    'twitter' => [
+    'client_id' => env('TWITTER_ID'),         // Your GitHub Client ID
+    'client_secret' => env('TWITTER_SECRET'), // Your GitHub Client Secret
+    'redirect' => env('TWITTER_URL'),
+    ],
+    'linkedin' => [
+    'client_id' => env('LINKEDIN_ID'),         // Your GitHub Client ID
+    'client_secret' => env('LINKEDIN_SECRET'), // Your GitHub Client Secret
+    'redirect' => env('LINKEDIN_URL'),
+    ],
+    'instagram' => [
+    'client_id' => env('INSTAGRAM_ID'),         // Your GitHub Client ID
+    'client_secret' => env('INSTAGRAM_SECRET'), // Your GitHub Client Secret
+    'redirect' => env('INSTAGRAM_URL'),
+    ],
+     'gitlab' => [
+    'client_id' => env('GITLAB_ID'),         // Your GitHub Client ID
+    'client_secret' => env('GITLAB_SECRET'), // Your GitHub Client Secret
+    'redirect' => env('GITLAB_URL'),
+    ],
+
 
 ];

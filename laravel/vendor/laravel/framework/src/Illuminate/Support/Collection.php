@@ -248,7 +248,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function some($key, $operator = null, $value = null)
     {
-        return $this->contains($key, $operator, $value);
+        return $this->contains(...func_get_args());
     }
 
     /**
@@ -517,7 +517,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Apply the callback if the collection is empty.
      *
-     * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
      * @return static|mixed
@@ -530,7 +529,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Apply the callback if the collection is not empty.
      *
-     * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
      * @return static|mixed
@@ -556,27 +554,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Apply the callback unless the collection is empty.
      *
-     * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
      * @return static|mixed
      */
     public function unlessEmpty(callable $callback, callable $default = null)
     {
-        return $this->unless($this->isEmpty(), $callback, $default);
+        return $this->whenNotEmpty($callback, $default);
     }
 
     /**
      * Apply the callback unless the collection is not empty.
      *
-     * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
      * @return static|mixed
      */
     public function unlessNotEmpty(callable $callback, callable $default = null)
     {
-        return $this->unless($this->isNotEmpty(), $callback, $default);
+        return $this->whenEmpty($callback, $default);
     }
 
     /**
