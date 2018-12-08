@@ -453,13 +453,8 @@
         var recom = false;
         @endif
         if(recom){
-            
             // Calcular dia de recompensas
             var dia = {{$users->diaRecompensa}};
-            dia++;
-            if(dia==8){
-                dia = 1;
-            }
             for(var i = dia; i<8; i++){
                 var recom = $("#recom" + i);
                 recom.html("");
