@@ -101,7 +101,7 @@
                     <form method="POST" action="/login">
                         @csrf                     
                         <div class="form-group ">
-                            <div class="">
+                            <div class="justify-content-center">
                                   <p>
                                       <label>Ingresa con alguna red social o plataforma de desarrollo:</label>
                                   </p>

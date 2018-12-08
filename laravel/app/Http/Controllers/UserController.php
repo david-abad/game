@@ -78,7 +78,7 @@ class UserController extends Controller {
             }
             DB::table('usuarios')->where('id', $id)->update(['nivelActual'=>$nuevoNivel]);
         }
-        DB::table('usuarios')->where('id', $id)->increment('creditos', ($nivel*5)+10);
+        DB::table('usuarios')->where('id', $id)->increment('creditos', ($nivel*5)+5);
         $response = new \stdClass(); //Para evitar error: Creating default object from empty value
         $response->result = 'Ok';
         echo json_encode($response);
