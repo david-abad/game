@@ -31,6 +31,7 @@ class UserController extends Controller {
             $recompensa = true;
         }
         $dia = $user->diaRecompensa;
+        $d1 = $dia;
         if($recompensa && !$recibida){
             $dia = $user->diaRecompensa + 1;
         }else{
@@ -42,11 +43,11 @@ class UserController extends Controller {
         DB::table('usuarios')->where("id", $id)->update(['diaRecompensa'=>$dia, 'ultimoLogin'=>$hoy]);
         if($recompensa){
             $add = 0;
-            if($dia == 1){
+            if($d1 == 1){
                 $add = 100;
-            }else if($dia < 5){
+            }else if($d1 < 5){
                 $add = 150;
-            }else if($dia < 7){
+            }else if($d1 < 7){
                 $add = 200;
             }else{
                 $add = 300;
@@ -77,7 +78,7 @@ class UserController extends Controller {
             }
             DB::table('usuarios')->where('id', $id)->update(['nivelActual'=>$nuevoNivel]);
         }
-        DB::table('usuarios')->where('id', $id)->increment('creditos', ($nivel*5)+10);
+        DB::table('usuarios')->where('id', $id)->increment('creditos', ($nivel*5)+5);
         $response = new \stdClass(); //Para evitar error: Creating default object from empty value
         $response->result = 'Ok';
         echo json_encode($response);
