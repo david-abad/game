@@ -59,7 +59,7 @@
                 <div class="card-header" >{{ __('TSW Login') }}</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
+                    <form method="POST" action="/login">
                         @csrf                     
                         <div class="form-group ">
                             <div class="col-md-10 ">
