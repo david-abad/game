@@ -41,6 +41,7 @@
             border-radius: 50px !important;
             margin-left: 10px;
             transition: 0.5s;
+            margin-top: 5px;
         }
 
         .btn:hover{
@@ -100,7 +101,7 @@
     <div class="row justify-content-center" >
         <div class="col-sm-6">
             <div class="card">
-                <div class="card-header">{{ __('Iniciar Sesión') }}</div>
+                <div class="card-header" style="font-size: 28px; font-weight: 100;">{{ __('Iniciar Sesión') }}</div>
                 <div class="card-body">
                     <form method="POST" action="/login">
                         @csrf                     

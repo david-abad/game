@@ -6,6 +6,19 @@
     <link rel="stylesheet" href="/../css/styleLvl1.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <style>
+            div #hero {
+                width: 50px;
+                height: 50px;
+                background-image: url('/../lvl1/{{$users->nave}}');
+                background-size: 50px;
+                position: absolute;
+                left: 575px;
+                top: 500px;
+                transition: 0.1s;
+                z-index: 10;
+            }
+        </style>
 </head>
 
 <body>
