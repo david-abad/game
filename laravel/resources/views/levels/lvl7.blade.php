@@ -36,7 +36,7 @@
     -->
     <div id="ganaste" class="fin">
         <h1>¡Ganaste!</h1>
-        <p>Recibiste 35 créditos</p>
+        <p>Recibiste 40 créditos</p>
     </div>
     <div id="perdiste" class="fin">
         <h1>Has perdido</h1>
